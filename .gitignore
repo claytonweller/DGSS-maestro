@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Dotenv environment variables file
+.env
+
+# Ignore map files
+**/*.js.map
+
+# Ignore VS files
+.vscode
+
+# Ignore js files (compiled typescript)
+**/*.js
+
+# Don't need the serverless compliation
+.serverless
+
+

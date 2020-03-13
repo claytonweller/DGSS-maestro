@@ -1,0 +1,19 @@
+{
+    "name": "maestro",
+    "version": "1.0.0",
+    "description": "Orchestration layer for data game show show",
+    "main": "index.js",
+    "scripts": {
+        "start": "NODE_PATH=. node app/index.js",
+        "dev": "./node_modules/nodemon/bin/nodemon.js -e ts --exec \"yarn build && yarn start\"",
+        "build": "node_modules/.bin/tsc",
+        "deploy": "yarn build && node_modules/.bin/sls deploy"
+    },
+    "author": "Clayton Weller",
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {
+        "nodemon": "^2.0.2",
+        "typescript": "^3.8.3"
+    }
+}
