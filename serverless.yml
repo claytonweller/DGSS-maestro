@@ -1,0 +1,45 @@
+org: claytonweller
+app: maestro
+service: DGSS
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  websocketsApiName: maestro-socket
+  websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
+
+layers:
+  maestroDependecies:
+    path: ./
+    compatibleRuntimes:
+      - nodejs12.x
+    package:
+      include:
+        - nodejs/node_modules/**
+      exclude:
+        - ./**
+
+functions:
+  connectionHandler:
+    handler: handler.connectionHandler
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+    layers:
+      - { Ref: MaestroDependeciesLambdaLayer }
+
+  defaultHandler:
+    handler: handler.defaultHandler
+    events:
+      - websocket: $default #simple event definition without extra route property
+    layers:
+      - { Ref: MaestroDependeciesLambdaLayer }
+  customFooHandler:
+    handler: handler.fooHandler
+    events:
+      - websocket:
+          route: foo # will trigger if $request.body.action === "foo"
+    layers:
+      - { Ref: MaestroDependeciesLambdaLayer }

@@ -7,11 +7,14 @@
         "start": "NODE_PATH=. node app/index.js",
         "dev": "./node_modules/nodemon/bin/nodemon.js -e ts --exec \"yarn build && yarn start\"",
         "build": "node_modules/.bin/tsc",
-        "deploy": "yarn build && node_modules/.bin/sls deploy"
+        "deploy": "yarn build && node_modules/.bin/sls deploy",
+        "serverless": "node_modules/.bin/sls"
     },
     "author": "Clayton Weller",
     "license": "ISC",
-    "dependencies": {},
+    "dependencies": {
+        "serverless": "^1.66.0"
+    },
     "devDependencies": {
         "nodemon": "^2.0.2",
         "typescript": "^3.8.3"
