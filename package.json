@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "start": "NODE_PATH=. node app/index.js",
-        "dev": "./node_modules/nodemon/bin/nodemon.js -e ts --exec \"yarn build && yarn start\"",
+        "server": "NODE_PATH=. node app/server.js",
+        "dev": "./node_modules/nodemon/bin/nodemon.js -e ts --exec \"yarn build && yarn server\"",
         "build": "node_modules/.bin/tsc",
         "deploy": "yarn build && node_modules/.bin/sls deploy",
         "serverless": "node_modules/.bin/sls"
@@ -13,7 +14,8 @@
     "author": "Clayton Weller",
     "license": "ISC",
     "dependencies": {
-        "serverless": "^1.66.0"
+        "serverless": "^1.66.0",
+        "ws": "^7.2.3"
     },
     "devDependencies": {
         "nodemon": "^2.0.2",
