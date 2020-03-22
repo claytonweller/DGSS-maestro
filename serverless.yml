@@ -21,7 +21,7 @@ layers:
 
 functions:
   connectionHandler:
-    handler: handler.connectionHandler
+    handler: app/handler.connectionHandler
     events:
       - websocket:
           route: $connect
@@ -29,17 +29,29 @@ functions:
           route: $disconnect
     layers:
       - { Ref: MaestroDependeciesLambdaLayer }
+    package:
+      include:
+        - app/handler.js
+      exclude:
+        - ./**
+        - nodejs/node_modules/**
 
   defaultHandler:
-    handler: handler.defaultHandler
+    handler: app/handler.defaultHandler
     events:
       - websocket: $default #simple event definition without extra route property
     layers:
       - { Ref: MaestroDependeciesLambdaLayer }
-  customFooHandler:
-    handler: handler.fooHandler
-    events:
-      - websocket:
-          route: foo # will trigger if $request.body.action === "foo"
-    layers:
-      - { Ref: MaestroDependeciesLambdaLayer }
+    package:
+      include:
+        - app/handler.js
+      exclude:
+        - ./**
+        - nodejs/node_modules/**
+  # customFooHandler:
+  #   handler: handler.fooHandler
+  #   events:
+  #     - websocket:
+  #         route: foo # will trigger if $request.body.action === "foo"
+  #   layers:
+  #     - { Ref: MaestroDependeciesLambdaLayer }
