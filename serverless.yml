@@ -7,6 +7,8 @@ provider:
   runtime: nodejs12.x
   websocketsApiName: maestro-socket
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
+  environment:
+    POSTGRES_URL: ${ssm:/maestro/postgres-url~true}
 
 layers:
   maestroDependecies:
@@ -20,11 +22,24 @@ layers:
         - ./**
 
 functions:
-  connectionHandler:
-    handler: app/handler.connectionHandler
+  connectHandler:
+    handler: app/handler.connectHandler
     events:
       - websocket:
           route: $connect
+    layers:
+      - { Ref: MaestroDependeciesLambdaLayer }
+    package:
+      include:
+        - app/handler.js
+        - db/**
+      exclude:
+        - ./**
+        - nodejs/node_modules/**
+
+  disconnectHandler:
+    handler: app/handler.disconnectHandler
+    events:
       - websocket:
           route: $disconnect
     layers:
@@ -32,6 +47,7 @@ functions:
     package:
       include:
         - app/handler.js
+        - db/**
       exclude:
         - ./**
         - nodejs/node_modules/**
@@ -45,6 +61,7 @@ functions:
     package:
       include:
         - app/handler.js
+        - db/**
       exclude:
         - ./**
         - nodejs/node_modules/**
