@@ -21,6 +21,9 @@ layers:
       exclude:
         - ./**
 
+package:
+  individually: true
+
 functions:
   connectHandler:
     handler: app/handler.connectHandler
@@ -33,9 +36,10 @@ functions:
       include:
         - app/handler.js
         - db/**
+        - config.js
       exclude:
         - ./**
-        - nodejs/node_modules/**
+        - node_modules/**
 
   disconnectHandler:
     handler: app/handler.disconnectHandler
@@ -48,9 +52,10 @@ functions:
       include:
         - app/handler.js
         - db/**
+        - config.js
       exclude:
         - ./**
-        - nodejs/node_modules/**
+        - node_modules/**
 
   defaultHandler:
     handler: app/handler.defaultHandler
@@ -62,9 +67,10 @@ functions:
       include:
         - app/handler.js
         - db/**
+        - config.js
       exclude:
         - ./**
-        - nodejs/node_modules/**
+        - node_modules/**
   # customFooHandler:
   #   handler: handler.fooHandler
   #   events:

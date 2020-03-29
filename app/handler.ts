@@ -12,7 +12,7 @@ export const connectHandler = async event => {
     aws_connection_id: event.requestContext.connectionId,
     source: 'string'
   }
-  Connection.create(params)
+  await Connection.create(params)
   return {
     statusCode: 200,
     body: JSON.stringify(
@@ -54,9 +54,16 @@ export const disconnectHandler = async event => {
 }
 
 export const defaultHandler = async event => {
-  const { domainName, stage, connectionId } = event.requestContext;
-  const callbackUrlForAWS = util.format(util.format('https://%s/%s', domainName, stage)); //construct the needed url
-  await sendMessageToClient(callbackUrlForAWS, connectionId, event);
+  await dbConnection()
+  const { domainName, stage } = event.requestContext;
+  const connections = await Connection.getAll()
+  console.warn(connections)
+  const messages = connections.rows.map(con => {
+    const callbackUrlForAWS = util.format(util.format('https://%s/%s', domainName, stage));
+    return sendMessageToClient(callbackUrlForAWS, con.aws_connection_id, event);
+  });
+
+  await Promise.all(messages)
 
   return {
     statusCode: 200,
@@ -75,9 +82,11 @@ const sendMessageToClient = (url, connectionId, payload) => {
         Data: JSON.stringify(payload),
       },
       (err, data) => {
-        if (err) {
+        if (err && err.statusCode !== 410) {
           console.log('err is', err);
           reject(err);
+        } else {
+          resolve('This is an expired connection')
         }
         resolve(data);
       }

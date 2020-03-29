@@ -4,23 +4,25 @@
   "description": "Orchestration layer for data game show show",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_PATH=. node app/index.js",
-    "server": "eval $(egrep -v '^#' .env | xargs) NODE_PATH=. node app/server.js",
+    "env": "eval $(egrep -v '^#' .env | xargs)",
+    "start": "yarn env && node app/index.js",
+    "server": "yarn env && node app/server.js",
     "dev": "./node_modules/nodemon/bin/nodemon.js -e ts --exec \"yarn build && yarn server\"",
-    "build": "eval $(egrep -v '^#' .env | xargs) node_modules/.bin/tsc",
-    "deploy": "yarn build && yarn sls deploy -v",
-    "sls": "node_modules/.bin/sls"
+    "build": "yarn env && node_modules/.bin/tsc",
+    "install-prod": "yarn install --production --modules-folder ./nodejs/node_modules",
+    "deploy": "yarn build && yarn install-prod && yarn sls deploy -v",
+    "sls": "yarn env && ../node_modules/.bin/sls"
   },
   "author": "Clayton Weller",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.643.0",
-    "pg": "^7.18.2",
-    "serverless": "^1.66.0",
-    "ws": "^7.2.3"
+    "pg": "^7.18.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.2",
-    "typescript": "^3.8.3"
+    "serverless": "^1.67.0",
+    "typescript": "^3.8.3",
+    "ws": "^7.2.3"
   }
 }
