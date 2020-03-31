@@ -1,56 +1,23 @@
 import * as WebSocket from 'ws'
 import { dbConnection } from '../db'
-import { Connection } from "../db/connections";
+import { Attendees } from "../db/attendees";
 
 const wss = new WebSocket.Server({ port: 8080 })
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
 
 dbConnection()
 
-// async function getAttendees() {
-//   console.log('MAKING THE ATTEMPT')
-//   try {
-//     const params = {
-//       performance_id: 1,
-//       attendee_id: 1,
-//       aws_connection_id: 'string',
-//       source: 'string'
-//     }
-//     await Connection.create(params);
-//     console.log('inserted')
-//     const connections = await Connection.getAll()
-//     console.log(connections.rows[0])
-//     await Connection.remove(connections.rows[0].id)
-//     const updateConnections = await Connection.getAll()
-//     console.log(updateConnections.rows[0])
+async function dbTest() {
+  await Attendees.remove(4, 'hard')
+  const attendees = await Attendees.getByParam({})
+  console.log(attendees)
+}
 
-//   } catch (e) {
-//     console.error(e)
-//   }
-// }
-
-// getAttendees()
+dbTest()
 
 wss.on('connection', async ws => {
 
   console.log('CONNECT')
-
-  const params = {
-    performance_id: 1,
-    attendee_id: 1,
-    aws_connection_id: 'string',
-    source: 'Crowd'
-  }
-  const connection = await Connection.create(params)
-  console.warn(connection.rows[0].id)
-  ws.send(formatAsAWSMessage(connection.rows[0].id))
-
-  ws.on('close', async message => {
-    console.log(message)
-    console.log('CLOSE')
-    const connections = await Connection.getAll()
-    await Connection.removeByConnectionId(connections.rows[0].id)
-  })
 
   ws.on('message', message => {
     console.log(`Received message => ${message}`)
