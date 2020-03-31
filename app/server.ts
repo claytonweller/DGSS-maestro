@@ -8,9 +8,18 @@ console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
 dbConnection()
 
 async function dbTest() {
-  await Attendees.remove(4, 'hard')
   const attendees = await Attendees.getByParam({})
   console.log(attendees)
+  const newA = await Attendees.create({ name: 'DOOFUS' })
+  console.log(newA)
+  const updatedA = await Attendees.update(newA.id, { phone: '123123123' })
+  console.log(updatedA)
+  const softD = await Attendees.remove(newA.id)
+  console.log(softD)
+  const hardD = await Attendees.remove(newA.id, 'hard')
+  console.log(hardD)
+  const remainder = await Attendees.getByParam({})
+  console.log(remainder)
 }
 
 dbTest()
