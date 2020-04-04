@@ -27,7 +27,7 @@ async function getByParam(table: string, params: any, limit: number = 10) {
   return res.rows
 }
 
-async function create(table, params) {
+async function create(table: string, params: any) {
   const columns: string[] = []
   const temp: string[] = []
   const values: any[] = []
@@ -46,48 +46,48 @@ async function create(table, params) {
   return res.rows[0]
 }
 
-async function update(table, id, params) {
+async function update(table: string, id: number | string, params: any) {
   const pairs: string[] = []
   const values: any[] = []
   Object.keys(params).forEach((k, i) => {
     pairs.push(`${k} = $${i + 1}`)
     values.push(params[k])
   })
-
+  const formatedId = typeof id === 'string' ? `'${id}'` : id
   const query = `
     UPDATE ${table}
     SET ${pairs.join(', ')}
-    WHERE id = ${id}
+    WHERE id = ${formatedId}
     RETURNING *;
   `
   const res = await db.query(query, values)
   return res.rows[0]
 }
 
-async function remove(table, id, style = '') {
+async function remove(table: string, id: number | string, style: string = '') {
   if (style === 'hard') {
     const query = `
       DELETE FROM ${table}
-      WHERE id = ${id}
+      WHERE id = $1
     `
-    return await db.query(query)
+    return await db.query(query, [id])
   }
 
   return await update(table, id, { removed_at: DateTime.local().toISO() })
 }
 
-export function crudify(tableName) {
+export function crudify(tableName: string) {
   return {
     async getByParam(params: any, limit: number = 10) {
       return await crud.getByParam(tableName, params, limit)
     },
-    async create(params) {
+    async create(params: any) {
       return await crud.create(tableName, params)
     },
-    async update(id, params) {
+    async update(id: string | number, params: any) {
       return await crud.update(tableName, id, params)
     },
-    async remove(id, style = '') {
+    async remove(id: string | number, style = '') {
       return await crud.remove(tableName, id, style)
     }
   }

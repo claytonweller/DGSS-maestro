@@ -15,12 +15,12 @@
   "author": "Clayton Weller",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.643.0",
     "luxon": "^1.22.2",
     "pg": "^7.18.2"
   },
   "devDependencies": {
     "@types/luxon": "^1.22.0",
+    "aws-sdk": "^2.653.0",
     "nodemon": "^2.0.2",
     "serverless": "^1.67.0",
     "typescript": "^3.8.3",

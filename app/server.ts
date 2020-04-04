@@ -1,28 +1,10 @@
 import * as WebSocket from 'ws'
 import { dbConnection } from '../db'
-import { Attendees } from "../db/attendees";
 
 const wss = new WebSocket.Server({ port: 8080 })
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
 
 dbConnection()
-
-async function dbTest() {
-  const attendees = await Attendees.getByParam({})
-  console.log(attendees)
-  const newA = await Attendees.create({ name: 'DOOFUS' })
-  console.log(newA)
-  const updatedA = await Attendees.update(newA.id, { phone: '123123123' })
-  console.log(updatedA)
-  const softD = await Attendees.remove(newA.id)
-  console.log(softD)
-  const hardD = await Attendees.remove(newA.id, 'hard')
-  console.log(hardD)
-  const remainder = await Attendees.getByParam({})
-  console.log(remainder)
-}
-
-dbTest()
 
 wss.on('connection', async ws => {
 
