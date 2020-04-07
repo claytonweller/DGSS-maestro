@@ -26,7 +26,7 @@ package:
 
 functions:
   connectHandler:
-    handler: app/handler.connectHandler
+    handler: app/handlers/connect.handler
     events:
       - websocket:
           route: $connect
@@ -34,15 +34,16 @@ functions:
       - { Ref: MaestroDependeciesLambdaLayer }
     package:
       include:
-        - app/handler.js
+        - app/handlers/connect.js
         - db/**
+        - app/actions/**
         - config.js
       exclude:
         - ./**
         - node_modules/**
 
   disconnectHandler:
-    handler: app/handler.disconnectHandler
+    handler: app/handlers/disconnect.handler
     events:
       - websocket:
           route: $disconnect
@@ -50,22 +51,24 @@ functions:
       - { Ref: MaestroDependeciesLambdaLayer }
     package:
       include:
-        - app/handler.js
+        - app/handlers/disconnect.js
         - db/**
+        - app/actions/**
         - config.js
       exclude:
         - ./**
         - node_modules/**
 
   defaultHandler:
-    handler: app/handler.defaultHandler
+    handler: app/handlers/default.handler
     events:
       - websocket: $default #simple event definition without extra route property
     layers:
       - { Ref: MaestroDependeciesLambdaLayer }
     package:
       include:
-        - app/handler.js
+        - app/handlers/default.js
+        - app/actions/**
         - db/**
         - config.js
       exclude:

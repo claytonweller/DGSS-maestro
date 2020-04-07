@@ -1,16 +1,17 @@
 import { dbConnection } from '../../db'
 import { Connection } from "../../db/connections";
 
-export const connectHandler = async event => {
+export const handler = async event => {
   await dbConnection()
-  console.warn(event)
+  const aws_connection_id = event.requestContext.connectionId
   const params = {
     performance_id: 1,
     attendee_id: 1,
-    aws_connection_id: event.requestContext.connectionId,
+    aws_connection_id,
     source: 'string'
   }
-  await Connection.create(params)
+  Connection.create(params)
+
   return {
     statusCode: 200,
     body: JSON.stringify(

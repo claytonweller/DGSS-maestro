@@ -1,7 +1,7 @@
 import { dbConnection } from '../../db'
 import { Connection } from "../../db/connections";
 
-export const disconnectHandler = async event => {
+export const handler = async event => {
   await dbConnection()
   console.warn(event)
   try {
