@@ -2,6 +2,9 @@ import * as WebSocket from 'ws'
 import { dbConnection } from '../db'
 import { manageEvent } from './actions'
 import { Connection } from '../db/connections'
+import { localMessager } from './localMessager'
+import * as AWS from 'aws-sdk'
+AWS.config.update({ region: 'us-east-1' })
 
 const wss = new WebSocket.Server({ port: 8080 })
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
@@ -22,13 +25,7 @@ wss.on('connection', async ws => {
   ws.on('message', async message => {
 
     console.log(`Received message => ${message}`)
-    await manageEvent(formatAsAWSEvent(message))
-
-    // wss.clients.forEach(function each(client) {
-    //   if (client.readyState === WebSocket.OPEN) {
-    //     client.send(formatAsAWSMessage(payload));
-    //   }
-    // });  
+    await manageEvent(formatAsAWSEvent(message), localMessager, { ws, wss })
   })
 
 })

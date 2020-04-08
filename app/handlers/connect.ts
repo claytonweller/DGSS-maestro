@@ -10,7 +10,7 @@ export const handler = async event => {
     aws_connection_id,
     source: 'string'
   }
-  Connection.create(params)
+  await Connection.create(params)
 
   return {
     statusCode: 200,
