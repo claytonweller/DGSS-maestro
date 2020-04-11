@@ -20,7 +20,7 @@ wss.on('connection', async ws => {
     source: null
   }
   const conn = await Connection.create(createParams)
-  ws.send(JSON.stringify({ action: 'local-server', currentConn: conn.rows[0] }))
+  ws.send(JSON.stringify({ action: 'local-server', currentConn: conn[0] }))
 
   ws.on('message', async message => {
 

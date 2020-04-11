@@ -4,24 +4,40 @@ import { Connection } from '../../db/connections'
 
 export const AWSMessager: IMessager = {
   sendToSender,
-  sendToAll
+  sendToAll,
+  sendToIds
 }
 
-async function sendToSender(params: IGateWayParams) {
-  await sendMessageToAWSGateway(params)
+async function sendToSender(params) {
+  const gatewayParams: IGateWayParams = {
+    event: params.event,
+    connectionId: params.event.requestContext.connectionId,
+    payload: params.payload
+  }
+  await sendMessageToAWSGateway(gatewayParams)
 }
 
 async function sendToAll({ event, payload }: { event: ILambdaEvent, payload: IMessagePayload }) {
   const connections = await Connection.getAll()
-  const messages = connections.rows.map(con => {
+  const awsIds = connections.map(con => con.aws_connection_id)
+  await Promise.all(createMessagesForAws(event, payload, awsIds))
+}
+
+async function sendToIds(
+  { event, payload, ids }: { event: ILambdaEvent, payload: IMessagePayload, ids: string[] }
+) {
+  await Promise.all(createMessagesForAws(event, payload, ids))
+}
+
+function createMessagesForAws(event: ILambdaEvent, payload: IMessagePayload, ids: string[]) {
+  return ids.map(id => {
     const params: IGateWayParams = {
       event,
-      connectionId: con.aws_connection_id,
+      connectionId: id,
       payload: payload
     }
     return sendMessageToAWSGateway(params);
   });
-  await Promise.all(messages)
 }
 
 const sendMessageToAWSGateway = ({ event, connectionId, payload }: IGateWayParams) => {
@@ -52,8 +68,18 @@ const sendMessageToAWSGateway = ({ event, connectionId, payload }: IGateWayParam
 }
 
 export interface IMessager {
-  sendToSender(IGateWayParams, sockets: any),
-  sendToAll({ event: ILambdaEvent, payload: IMessagePayload }, sockets: any)
+  sendToSender(
+    { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
+    sockets: any
+  )
+  sendToAll(
+    { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
+    sockets: any
+  ),
+  sendToIds(
+    { event, payload, ids }: { event: ILambdaEvent, payload: IMessagePayload, ids: string[] },
+    sockets: any
+  )
 }
 
 interface IGateWayParams {
@@ -62,7 +88,7 @@ interface IGateWayParams {
   payload: IMessagePayload
 }
 
-interface ILambdaEvent {
+export interface ILambdaEvent {
   requestContext: {
     routeKey: string
     messageId: string
@@ -82,7 +108,7 @@ interface ILambdaEvent {
   isBase64Encoded: boolean
 }
 
-interface IMessagePayload {
+export interface IMessagePayload {
   action: string,
   params: any
 }

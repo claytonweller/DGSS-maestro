@@ -3,10 +3,11 @@ import { IMessager } from './actions/messager'
 
 export const localMessager: IMessager = {
   sendToSender,
-  sendToAll
+  sendToAll,
+  sendToIds
 }
 
-async function sendToSender(params: IGateWayParams, sockets) {
+async function sendToSender(params, sockets) {
   return await sockets.ws.send(JSON.stringify(params.payload))
 }
 
@@ -18,33 +19,37 @@ async function sendToAll(params, sockets) {
   })
 }
 
-interface IGateWayParams {
-  event: ILambdaEvent,
-  connectionId: string | null,
-  payload: IMessagePayload
+async function sendToIds(params, sockets) {
+  return await sockets.ws.send(JSON.stringify(params.payload))
 }
 
-interface ILambdaEvent {
-  requestContext: {
-    routeKey: string
-    messageId: string
-    eventType: string
-    extendedRequestId: string
-    requestTime: string
-    messageDirection: string
-    stage: string
-    connectedAt: number
-    requestTimeEpoch: number
-    requestId: string
-    domainName: string
-    connectionId: string
-    apiId: string
-  },
-  body: any,
-  isBase64Encoded: boolean
-}
+// interface IGateWayParams {
+//   event: ILambdaEvent,
+//   connectionId: string | null,
+//   payload: IMessagePayload
+// }
 
-interface IMessagePayload {
-  action: string,
-  params: any
-}
+// interface ILambdaEvent {
+//   requestContext: {
+//     routeKey: string
+//     messageId: string
+//     eventType: string
+//     extendedRequestId: string
+//     requestTime: string
+//     messageDirection: string
+//     stage: string
+//     connectedAt: number
+//     requestTimeEpoch: number
+//     requestId: string
+//     domainName: string
+//     connectionId: string
+//     apiId: string
+//   },
+//   body: any,
+//   isBase64Encoded: boolean
+// }
+
+// interface IMessagePayload {
+//   action: string,
+//   params: any
+// }

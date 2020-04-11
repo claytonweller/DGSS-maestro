@@ -1,21 +1,32 @@
 import { Connection } from "../../db/connections"
+import { ILambdaEvent, IMessagePayload, IMessager } from "./messager";
 
-export const manageEvent = async (event, messager, sockets = {}) => {
+// In order to keep the local and prod development separate we send through a specifi 'messager'
+// function for each environment that knows how to handle events in its respective context 
+// The 'sockets' param is only used in local development. Handlers are entirely event driven.
+export const manageEvent = async (event: ILambdaEvent, messager: IMessager, sockets = {}) => {
   console.log('BODY', event.body)
   const message = JSON.parse(event.body)
   if (message.action === 'connect-source') {
     const { params } = message
     const { connectionId } = event.requestContext
-    const updatedParams = {
-      source: params.source
-    }
+    const updatedParams = { source: params.source }
     const currentConnection = await Connection.updateByAWSID(connectionId, updatedParams)
-    await messager.sendToSender(
-      { event, connectionId, payload: { action: 'conn-update', params: currentConnection } },
-      sockets
-    )
+    const payload: IMessagePayload = { action: 'conn-update', params: currentConnection }
+    await messager.sendToSender({ event, payload }, sockets)
   }
+
   if (message.action === 'all') {
-    await messager.sendToAll({ event, payload: { action: 'test' } }, sockets)
+    await messager.sendToAll({ event, payload: { action: 'all', params: {} } }, sockets)
+  }
+
+  if (message.action === 'random') {
+    const connections = await Connection.getAll()
+    const randomConnection = connections[Math.floor(Math.random() * connections.length)]
+    const ranomAWSId = randomConnection.aws_connection_id
+    await messager.sendToIds(
+      { event, payload: { action: 'rand', params: {} }, ids: [ranomAWSId] }
+      , sockets
+    )
   }
 }

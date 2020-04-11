@@ -4,15 +4,25 @@ import { db } from "./index";
 const TABLE_NAME = 'current_connections'
 const crud = crudify(TABLE_NAME)
 
-export async function getAll(limit = 10) {
+export interface IConnection {
+  id: string
+  perfomance_id: number
+  attendee_id: number
+  aws_connection_id: string
+  created_at: string
+  source: string
+}
+
+export async function getAll(limit = 10): Promise<IConnection[]> {
   const query = `
     SELECT * FROM current_connections
     LIMIT ${limit}
   `
-  return await db.query(query)
+  const conns = await db.query(query)
+  return conns.rows
 }
 
-export async function create(params: ICreateParams) {
+export async function create(params: ICreateParams): Promise<IConnection> {
   const query = `
     INSERT INTO current_connections (
       performance_id,
@@ -29,7 +39,8 @@ export async function create(params: ICreateParams) {
     params.aws_connection_id,
     params.source
   ]
-  return await db.query(query, qParams)
+  const conn = await db.query(query, qParams)
+  return conn.rows[0]
 }
 
 export async function removeByConnectionId(id) {
@@ -40,7 +51,7 @@ export async function removeByConnectionId(id) {
   return await db.query(query, [id])
 }
 
-export async function updateByAWSID(awsId, params) {
+export async function updateByAWSID(awsId, params): Promise<IConnection> {
   const pairs: string[] = []
   const values: any[] = []
   Object.keys(params).forEach((k, i) => {
