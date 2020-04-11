@@ -7,30 +7,40 @@ import * as AWS from 'aws-sdk'
 AWS.config.update({ region: 'us-east-1' })
 
 const wss = new WebSocket.Server({ port: 8080 })
+const clients = {}
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
 dbConnection()
 
-wss.on('connection', async ws => {
-
+wss.on('connection', async (ws, req) => {
   console.log('CONNECT------\n')
+  const awsId = req.headers['sec-websocket-key']
+  clients[awsId] = ws
   const createParams = {
     performance_id: 10001,
-    aws_connection_id: 'test',
+    aws_connection_id: awsId,
     attendee_id: null,
     source: null
   }
   const conn = await Connection.create(createParams)
-  ws.send(JSON.stringify({ action: 'local-server', currentConn: conn[0] }))
+  console.log('CREATED: ', awsId)
+  ws.send(JSON.stringify({ action: 'local-server', currentConn: conn }))
 
   ws.on('message', async message => {
 
     console.log(`Received message => ${message}`)
-    await manageEvent(formatAsAWSEvent(message), localMessager, { ws, wss })
+    await manageEvent(formatAsAWSEvent(message, awsId), localMessager, { ws, wss, clients })
+  })
+
+  ws.on('close', async () => {
+    await Connection.removeByConnectionId(awsId)
+    delete clients[awsId]
+    console.log('DELTED: ', awsId)
+    console.log('Clients remaining - ', Object.keys(clients).length)
   })
 
 })
 
-function formatAsAWSEvent(message) {
+function formatAsAWSEvent(message, id) {
   return {
     requestContext: {
       routeKey: "$default",
@@ -45,7 +55,7 @@ function formatAsAWSEvent(message) {
       identity: { cognitoIdentityPoolId: null, cognitoIdentityId: null, principalOrgId: null, cognitoAuthenticationType: null, userArn: null },
       requestId: "KG99mGiKoAMF4pQ=",
       domainName: "g298l0uqlc.execute-api.us-east-1.amazonaws.com",
-      connectionId: "LOCAL_KEY_DUDE",
+      connectionId: id,
       apiId: "g298l0uqlc"
     },
     body: message,

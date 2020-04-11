@@ -1,5 +1,9 @@
 import * as WebSocket from 'ws'
-import { IMessager } from './actions/messager'
+import {
+  IMessager,
+  IMessagePayload,
+  ILambdaEvent
+} from './actions/messager'
 
 export const localMessager: IMessager = {
   sendToSender,
@@ -7,49 +11,31 @@ export const localMessager: IMessager = {
   sendToIds
 }
 
-async function sendToSender(params, sockets) {
-  return await sockets.ws.send(JSON.stringify(params.payload))
+async function sendToSender(
+  { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
+  sockets
+) {
+  return await sockets.ws.send(JSON.stringify(payload))
 }
 
-async function sendToAll(params, sockets) {
+async function sendToAll(
+  { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
+  sockets
+) {
   await sockets.wss.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(params.payload));
+      client.send(JSON.stringify(payload));
     }
   })
 }
 
-async function sendToIds(params, sockets) {
-  return await sockets.ws.send(JSON.stringify(params.payload))
+async function sendToIds(
+  { event, payload, ids }: { event: ILambdaEvent, payload: IMessagePayload, ids: string[] },
+  sockets
+) {
+  const messages = ids.map(id => {
+    return sockets.clients[id].send(JSON.stringify(payload))
+  })
+
+  await Promise.all(messages)
 }
-
-// interface IGateWayParams {
-//   event: ILambdaEvent,
-//   connectionId: string | null,
-//   payload: IMessagePayload
-// }
-
-// interface ILambdaEvent {
-//   requestContext: {
-//     routeKey: string
-//     messageId: string
-//     eventType: string
-//     extendedRequestId: string
-//     requestTime: string
-//     messageDirection: string
-//     stage: string
-//     connectedAt: number
-//     requestTimeEpoch: number
-//     requestId: string
-//     domainName: string
-//     connectionId: string
-//     apiId: string
-//   },
-//   body: any,
-//   isBase64Encoded: boolean
-// }
-
-// interface IMessagePayload {
-//   action: string,
-//   params: any
-// }

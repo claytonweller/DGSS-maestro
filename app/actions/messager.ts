@@ -8,11 +8,11 @@ export const AWSMessager: IMessager = {
   sendToIds
 }
 
-async function sendToSender(params) {
+async function sendToSender({ event, payload }: { event: ILambdaEvent, payload: IMessagePayload }) {
   const gatewayParams: IGateWayParams = {
-    event: params.event,
-    connectionId: params.event.requestContext.connectionId,
-    payload: params.payload
+    event,
+    connectionId: event.requestContext.connectionId,
+    payload
   }
   await sendMessageToAWSGateway(gatewayParams)
 }
