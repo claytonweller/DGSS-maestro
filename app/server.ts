@@ -24,7 +24,7 @@ wss.on('connection', async (ws, req) => {
   }
   const conn = await Connection.create(createParams)
   console.log('CREATED: ', awsId)
-  ws.send(JSON.stringify({ action: 'local-server', currentConn: conn }))
+  ws.send(JSON.stringify({ action: 'local-server', params: conn }))
 
   ws.on('message', async message => {
 
