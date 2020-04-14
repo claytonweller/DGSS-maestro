@@ -22,6 +22,16 @@ export async function getAll(limit = 10): Promise<IConnection[]> {
   return conns.rows
 }
 
+export async function getBySource(source, limit = 10): Promise<IConnection[]> {
+  const query = `
+    SELECT * FROM current_connections
+    where source = $1
+    LIMIT $2
+  `
+  const conns = await db.query(query, [source, limit])
+  return conns.rows
+}
+
 export async function create(params: ICreateParams): Promise<IConnection> {
   const query = `
     INSERT INTO current_connections (
@@ -68,12 +78,24 @@ export async function updateByAWSID(awsId, params): Promise<IConnection> {
   return res.rows[0]
 }
 
+// Performance id 10001 is my stand in for local host
+export async function removeAll(performanceId = 10001): Promise<void> {
+  const query = `
+    DELETE FROM ${TABLE_NAME}
+    WHERE performance_id = $1
+  `
+  await db.query(query, [performanceId])
+  console.log('CLEARED ALL CONNECTIONS FROM PERFORMANCE: ', performanceId)
+}
+
 export const Connection = {
   update: crud.update,
   updateByAWSID,
+  getBySource,
   getAll,
   create,
   removeByConnectionId,
+  removeAll
 }
 
 interface ICreateParams {

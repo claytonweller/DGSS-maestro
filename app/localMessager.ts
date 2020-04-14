@@ -34,7 +34,10 @@ async function sendToIds(
   sockets
 ) {
   const messages = ids.map(id => {
-    return sockets.clients[id].send(JSON.stringify(payload))
+    if (sockets.clients[id]) {
+      return sockets.clients[id].send(JSON.stringify(payload))
+    }
+    return null
   })
 
   await Promise.all(messages)

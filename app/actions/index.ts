@@ -25,8 +25,17 @@ export const manageEvent = async (event: ILambdaEvent, messager: IMessager, sock
     const randomConnection = connections[Math.floor(Math.random() * connections.length)]
     const ranomAWSId = randomConnection.aws_connection_id
     await messager.sendToIds(
-      { event, payload: { action: 'rand', params: {} }, ids: [ranomAWSId] }
-      , sockets
+      { event, payload: { action: 'rand', params: {} }, ids: [ranomAWSId] },
+      sockets
+    )
+  }
+
+  if (message.action === 'source') {
+    const connections = await Connection.getBySource(message.params.source)
+    const ids = connections.map(con => con.aws_connection_id)
+    await messager.sendToIds(
+      { event, payload: { action: 'source', params: {} }, ids },
+      sockets
     )
   }
 }
