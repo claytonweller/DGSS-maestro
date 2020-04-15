@@ -11,6 +11,7 @@ export const handler = async event => {
     source: 'string'
   }
   await Connection.create(params)
+  // This removes all the test connections so they don't gum up the works
 
   return {
     statusCode: 200,

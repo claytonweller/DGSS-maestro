@@ -79,13 +79,13 @@ export async function updateByAWSID(awsId, params): Promise<IConnection> {
 }
 
 // Performance id 10001 is my stand in for local host
-export async function removeAll(performanceId = 10001): Promise<void> {
+export async function removeAll(performanceId = 0): Promise<void> {
   const query = `
     DELETE FROM ${TABLE_NAME}
-    WHERE performance_id = $1
+    WHERE performance_id < $1
   `
   await db.query(query, [performanceId])
-  console.log('CLEARED ALL CONNECTIONS FROM PERFORMANCE: ', performanceId)
+  console.log('CLEARED ALL CONNECTIONS FROM BEFORE PERFORMANCE: ', performanceId)
 }
 
 export const Connection = {

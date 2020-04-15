@@ -4,4 +4,4 @@ import { crudify } from "./index";
 
 const TABLE_NAME = 'audience_attendees_j'
 
-export const AuidenceAttendees = crudify(TABLE_NAME) 
+export const AuidenceAttendee = crudify(TABLE_NAME) 

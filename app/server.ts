@@ -10,7 +10,6 @@ const wss = new WebSocket.Server({ port: 8080 })
 const clients = {}
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`)
 dbConnection()
-Connection.removeAll()
 
 wss.on('connection', async (ws, req) => {
   console.log('CONNECT------\n')
