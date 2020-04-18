@@ -4,7 +4,7 @@ import { db } from './'
 async function getByParam(table: string, params: any, limit: number = 10) {
   const arr: string[] = [`SELECT * FROM ${table} WHERE removed_at is null`]
   const values: string[] = []
-  if (params) {
+  if (Object.keys(params).length) {
     Object.keys(params).forEach((k, i) => {
       values.push(params[k])
       arr.push(`AND ${k} = $${i + 1}`)
@@ -21,17 +21,19 @@ async function create(table: string, params: any) {
   const columns: string[] = []
   const temp: string[] = []
   const values: any[] = []
-  Object.keys(params).forEach((k, i) => {
-    columns.push(k)
-    temp.push(`$${i + 1}`)
-    values.push(params[k])
-  })
-
+  if (Object.keys(params).length) {
+    Object.keys(params).forEach((k, i) => {
+      columns.push(k)
+      temp.push(`$${i + 1}`)
+      values.push(params[k])
+    })
+  }
   const query = `
     INSERT INTO ${table} ( ${columns.join(', ')} )
     VALUES ( ${temp.join(', ')} )
     RETURNING *;
   `
+  console.warn(query)
   const res = await db.query(query, values)
   return res.rows[0]
 }
@@ -68,10 +70,10 @@ async function remove(table: string, id: number | string, style: string = '') {
 
 export function crudify(tableName: string) {
   return {
-    async getByParam(params: any, limit: number = 10) {
+    async getByParam(params: any = {}, limit: number = 10) {
       return await crud.getByParam(tableName, params, limit)
     },
-    async create(params: any) {
+    async create(params: any = {}) {
       return await crud.create(tableName, params)
     },
     async update(id: string | number, params: any) {

@@ -78,7 +78,6 @@ export async function updateByAWSID(awsId, params): Promise<IConnection> {
   return res.rows[0]
 }
 
-// Performance id 10001 is my stand in for local host
 export async function removeAll(performanceId = 0): Promise<void> {
   const query = `
     DELETE FROM ${TABLE_NAME}

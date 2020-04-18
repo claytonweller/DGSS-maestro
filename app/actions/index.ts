@@ -1,4 +1,4 @@
-import { Performance, Audience, Connection } from "../../db"
+import { Performance, Audience, Connection, Attendee, AuidenceAttendee } from "../../db"
 import { ILambdaEvent, IMessagePayload, IMessager } from "./messager";
 import { DateTime } from "luxon";
 
@@ -29,26 +29,61 @@ export const manageEvent = async (event: ILambdaEvent, messager: IMessager, sock
 
 const actionHash = {
   defaultAction,
-  'create-performance': createPerformance,
-  'end-performance': endPerformance,
+  'join-performance': joinPerformanceAction,
+  'create-performance': createPerformanceAction,
+  'end-performance': endPerformanceAction,
   'connect-source': connectSourceAction,
   'all': allAction,
   'source': sourceAction,
   'random': randomAction
 }
 
-// This function is required for the app to work
+async function joinPerformanceAction(actionElements: IActionElements) {
+  const { body, event, messager, sockets } = actionElements
+  const name = body.params.name ? body.params.name : 'Anonymous'
+  const { audience_id, performance_id } = body.params
+  // TODO eventually make it able to find exsiting attendees to attache them to shows
+  const attendee = await Attendee.create({ name })
+  console.warn(attendee)
+  const conParams = {
+    attendee_id: attendee.id,
+    performance_id
+  }
+  const queries = [
+    Connection.updateByAWSID(event.requestContext.connectionId, conParams),
+    AuidenceAttendee.create({ audience_id, attendee_id: attendee.id })
+  ]
+  const res = await Promise.all(queries)
+
+  // const payload: IMessagePayload{
+  //   action:'performance-joined',
+  //   params: {
+  //     attendee,
+  //     currentConn
+  //   }
+  // }
+
+  // await messager.sendToSender({ event, payload }, sockets)
+}
+
 async function connectSourceAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements
   const { params } = body
   const { connectionId } = event.requestContext
   const updatedParams = { source: params.source }
-  const currentConnection = await Connection.updateByAWSID(connectionId, updatedParams)
-  const payload: IMessagePayload = { action: 'conn-update', params: currentConnection }
+  const queries = [Connection.updateByAWSID(connectionId, updatedParams)]
+  if (params.source !== 'control') {
+    queries.push(Performance.getActive())
+  }
+  const [currentConnection, activePerformances] = await Promise.all(queries)
+  const payload: IMessagePayload = {
+    action: 'conn-update',
+    params: { currentConnection, activePerformances }
+  }
   await messager.sendToSender({ event, payload }, sockets)
 }
 
-async function createPerformance(actionElements: IActionElements) {
+async function createPerformanceAction(actionElements: IActionElements) {
   const { event, messager, sockets } = actionElements
   const control_aws_id = event.requestContext.connectionId
   const performanceParams = {
@@ -67,7 +102,7 @@ async function createPerformance(actionElements: IActionElements) {
   messager.sendToSender({ event, payload }, sockets)
 }
 
-async function endPerformance(actionElements: IActionElements) {
+async function endPerformanceAction(actionElements: IActionElements) {
   const { event, body, messager, sockets } = actionElements
   await Performance.update(body.params.id, { ended_at: DateTime.local().toISO() })
   const payload = {

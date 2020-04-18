@@ -16,7 +16,7 @@ wss.on('connection', async (ws, req) => {
   const awsId = req.headers['sec-websocket-key']
   clients[awsId] = ws
   const createParams = {
-    performance_id: 10001,
+    performance_id: 0,
     aws_connection_id: awsId,
     attendee_id: null,
     source: null
