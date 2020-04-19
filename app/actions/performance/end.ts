@@ -9,5 +9,5 @@ export async function endPerformanceAction(actionElements: IActionElements) {
     action: 'performance-ended',
     params: {}
   }
-  messager.sendToAll({ event, payload }, sockets)
+  await messager.sendToAll({ event, payload }, sockets)
 }
