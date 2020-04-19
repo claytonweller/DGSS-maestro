@@ -22,13 +22,23 @@ export async function getAll(limit = 10): Promise<IConnection[]> {
   return conns.rows
 }
 
-export async function getBySource(source, limit = 10): Promise<IConnection[]> {
-  const query = `
+export async function getBySource(source, performance_id = 0, limit = 0): Promise<IConnection[]> {
+  let query = `
     SELECT * FROM current_connections
     where source = $1
-    LIMIT $2
   `
-  const conns = await db.query(query, [source, limit])
+  const params = [source]
+
+  if (performance_id) {
+    params.push(performance_id)
+    query += ` AND performance_id = $${params.length}`
+  }
+
+  if (limit) {
+    params.push(limit)
+    query += ` LIMIT $${params.length}`
+  }
+  const conns = await db.query(query, params)
   return conns.rows
 }
 

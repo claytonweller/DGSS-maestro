@@ -12,8 +12,8 @@ async function getByParam(table: string, params: any, limit: number = 10) {
   }
   arr.push(`LIMIT ${limit}`)
   const query = arr.join(' ')
-  console.log(query)
   const res = await db.query(query, values)
+  console.log('Get from ', table)
   return res.rows
 }
 
@@ -33,8 +33,8 @@ async function create(table: string, params: any) {
     VALUES ( ${temp.join(', ')} )
     RETURNING *;
   `
-  console.warn(query)
   const res = await db.query(query, values)
+  console.log('Create in ', table)
   return res.rows[0]
 }
 
@@ -53,6 +53,7 @@ async function update(table: string, id: number | string, params: any) {
     RETURNING *;
   `
   const res = await db.query(query, values)
+  console.log('Update in ', table)
   return res.rows[0]
 }
 
@@ -62,9 +63,10 @@ async function remove(table: string, id: number | string, style: string = '') {
       DELETE FROM ${table}
       WHERE id = $1
     `
+    console.log('HARD delete from ', table)
     return await db.query(query, [id])
   }
-
+  console.log('Soft delete from ', table)
   return await update(table, id, { removed_at: DateTime.local().toISO() })
 }
 
