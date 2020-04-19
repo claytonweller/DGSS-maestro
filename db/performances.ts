@@ -10,7 +10,7 @@ async function getActive() {
     AND created_at > $1
   `
   console.log(query)
-  const res = await db.query(query, [DateTime.local().minus({ days: 1 }).toISO()])
+  const res = await db.query(query, [DateTime.local().minus({ hours: 4 }).toISO()])
   return res.rows
 }
 
