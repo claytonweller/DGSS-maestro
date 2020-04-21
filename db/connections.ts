@@ -6,7 +6,7 @@ const crud = crudify(TABLE_NAME)
 
 export interface IConnection {
   id: string
-  perfomance_id: number
+  performance_id: number
   attendee_id: number
   aws_connection_id: string
   created_at: string
@@ -22,12 +22,17 @@ export async function getAll(limit = 10): Promise<IConnection[]> {
   return conns.rows
 }
 
-export async function getBySource(source, performance_id = 0, limit = 0): Promise<IConnection[]> {
+export async function getBySource(sources: string[], performance_id = 0, limit = 0): Promise<IConnection[]> {
   let query = `
     SELECT * FROM current_connections
     where source = $1
   `
-  const params = [source]
+  const params: Array<string | number> = [sources[0]]
+
+  if (sources[1]) {
+    params.push(sources[1])
+    query += ` OR source = $${params.length}`
+  }
 
   if (performance_id) {
     params.push(performance_id)
