@@ -2,7 +2,7 @@ import { ILambdaEvent, IMessagePayload, IMessager } from "./messager";
 import { performanceActionHash } from "./performance";
 import { testActionHash } from './test'
 import { utilActionHash } from './utility'
-
+import { moduleActionHash } from "./modules";
 
 // In order to keep the local and prod development separate we send through a specifi 'messager'
 // function for each environment that knows how to handle events in its respective context 
@@ -32,7 +32,8 @@ const actionHash = {
   defaultAction,
   ...utilActionHash,
   ...testActionHash,
-  ...performanceActionHash
+  ...performanceActionHash,
+  ...moduleActionHash
 }
 
 async function defaultAction(actionElements: IActionElements) { console.log(actionElements) }
