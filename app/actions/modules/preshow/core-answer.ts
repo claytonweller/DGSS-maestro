@@ -7,12 +7,17 @@ export async function preshowCoreAnswerAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const data = JSON.parse(body.params.data);
 
+  const interactionParams = {
+    ...body.params,
+    response: data.response,
+    prompt: data.question.text
+  }
   const [attendee, otherClients] = await Promise.all([
     Attendee.update(body.params.attendee_id, {
       [data.question.column]: data.response,
     }),
     Connection.getBySource(["display", "control"], body.params.performance_id),
-    Interaction.create(body.params),
+    Interaction.create(interactionParams),
   ]);
 
   const nextQuestion = chooseNextQuestion(data.answered);

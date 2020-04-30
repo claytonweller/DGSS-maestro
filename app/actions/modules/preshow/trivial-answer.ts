@@ -8,14 +8,18 @@ export async function preshowTrivialAnswerAction(
 ) {
   const { body, event, messager, sockets } = actionElements;
   const data = JSON.parse(body.params.data);
-
-  const res = await Promise.all([
-    Interaction.create(body.params),
+  const interactionParams = {
+    ...body.params,
+    response: data.response,
+    prompt: data.question.text
+  }
+  const [interaction, otherConnections] = await Promise.all([
+    Interaction.create(interactionParams),
     Connection.getBySource(["display", "control"], body.params.performance_id),
   ]);
 
   const nextQuestion = chooseNextQuestion(data.answered);
-  const payload: IMessagePayload = {
+  const userPayload: IMessagePayload = {
     action: "preshow-next-question",
     params: {
       answered: data.answered,
@@ -23,19 +27,17 @@ export async function preshowTrivialAnswerAction(
     },
   };
 
-  // const resPayload: IMessagePayload = {
-  //   action: 'preshow-answer',
-  //   params: {
-  //     question: {
+  const dataPayload: IMessagePayload = {
+    action: "preshow-answer",
+    params: {
+      data,
+      interaction
+    },
+  };
 
-  //     },
-
-  //   }
-  // }
-
-  const ids = res[1].map((con) => con.aws_connection_id);
+  const ids = otherConnections.map((con) => con.aws_connection_id);
   await Promise.all([
-    messager.sendToSender({ event, payload }, sockets),
-    messager.sendToIds({ event, payload, ids }, sockets),
+    messager.sendToSender({ event, payload: userPayload }, sockets),
+    messager.sendToIds({ event, payload: dataPayload, ids }, sockets),
   ]);
 }
