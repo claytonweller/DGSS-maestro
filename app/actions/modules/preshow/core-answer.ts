@@ -1,7 +1,7 @@
-import { IActionElements } from "../..";
-import { Interaction, Attendee, Connection } from "../../../../db";
-import { IMessagePayload } from "../../messager";
-import { chooseNextQuestion } from ".";
+import { IActionElements } from '../..';
+import { Interaction, Attendee, Connection } from '../../../../db';
+import { IMessagePayload } from '../../messager';
+import { chooseNextQuestion } from '.';
 
 export async function preshowCoreAnswerAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
@@ -10,30 +10,38 @@ export async function preshowCoreAnswerAction(actionElements: IActionElements) {
   const interactionParams = {
     ...body.params,
     response: data.response,
-    prompt: data.question.text
+    prompt: data.question.text,
+  };
+  if (data.question.column === 'name') {
+    // TODO eventually  we might want to make unique names for anonymous attendees
+    const name = data.response === '-skip-' ? 'Anonymous' : data.response;
+    data.response = name;
+    interactionParams.attendee_name = name;
+    interactionParams.response = name;
   }
-  const [attendee, otherClients] = await Promise.all([
+  const [otherClients, interaction, attendee] = await Promise.all([
+    Connection.getBySource(['display', 'control'], body.params.performance_id),
+    Interaction.create(interactionParams),
     Attendee.update(body.params.attendee_id, {
       [data.question.column]: data.response,
     }),
-    Connection.getBySource(["display", "control"], body.params.performance_id),
-    Interaction.create(interactionParams),
   ]);
 
   const nextQuestion = chooseNextQuestion(data.answered);
   const crowdPayload: IMessagePayload = {
-    action: "preshow-next-question",
+    action: 'preshow-next-question',
     params: {
       answered: data.answered,
       question: nextQuestion,
+      attendee,
     },
   };
 
   const dataPayload: IMessagePayload = {
-    action: "preshow-answer",
+    action: 'preshow-answer',
     params: {
       data,
-      attendee,
+      interaction,
     },
   };
   const ids = otherClients.map((con) => con.aws_connection_id);

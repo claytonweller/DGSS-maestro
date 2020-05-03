@@ -1,13 +1,13 @@
-import { preshowAcknowledgeAction } from "./acknowledge";
-import { preshowCoreAnswerAction } from "./core-answer";
-import { preshowTrivialAnswerAction } from "./trivial-answer";
-import { coreQuestions, trivialQuestions } from "./questions";
+import { preshowAcknowledgeAction } from './acknowledge';
+import { preshowCoreAnswerAction } from './core-answer';
+import { preshowTrivialAnswerAction } from './trivial-answer';
+import { coreQuestions, trivialQuestions } from './questions';
 
 export const preshowActionHash = {
-  "preshow-start-performance": () => console.log("START"),
-  "preshow-acknowledge": preshowAcknowledgeAction,
-  "preshow-core-answer": preshowCoreAnswerAction,
-  "preshow-trivial-answer": preshowTrivialAnswerAction,
+  'preshow-start-performance': () => console.log('START'),
+  'preshow-acknowledge': preshowAcknowledgeAction,
+  'preshow-core-answer': preshowCoreAnswerAction,
+  'preshow-trivial-answer': preshowTrivialAnswerAction,
 };
 
 export const initializeAnswered = () => {
@@ -17,28 +17,24 @@ export const initializeAnswered = () => {
   };
 };
 
-export const chooseNextQuestion = (answered: {
-  core: boolean[];
-  trivial: boolean[];
-}) => {
+export const chooseNextQuestion = (answered: { core: boolean[]; trivial: boolean[] }) => {
   if (answered.core.includes(false)) {
-    const chosenQuestion = getARemainingQuestion(answered.core, "core");
+    const chosenQuestion = getARemainingQuestion(answered.core, 'core');
     return { ...chosenQuestion, core: true };
   }
   if (answered.trivial.includes(false)) {
-    return getARemainingQuestion(answered.trivial, "trivial");
+    return getARemainingQuestion(answered.trivial, 'trivial');
   }
   return {
-    text:
-      "You answered all the questions! Got another one we should ask next time?",
-    responseType: "text",
-    buttonText: "Good Question",
+    text: 'You answered all the questions! Got another one we should ask next time?',
+    responseType: 'text',
+    buttonText: 'Good Question',
+    display: '"_RESPONSE_?", _NAME_',
   };
 };
 
 const getARemainingQuestion = (answered: boolean[], questionType: string) => {
-  const questionArr =
-    questionType === "core" ? coreQuestions : trivialQuestions;
+  const questionArr = questionType === 'core' ? coreQuestions : trivialQuestions;
   const remainingQuestions = answered.reduce((pre, a, i) => {
     if (!a) pre.push({ q: questionArr[i], i });
     return pre;

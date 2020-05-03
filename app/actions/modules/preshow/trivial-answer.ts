@@ -1,26 +1,24 @@
-import { IActionElements } from "../..";
-import { Interaction, Connection } from "../../../../db";
-import { IMessagePayload } from "../../messager";
-import { chooseNextQuestion } from "./";
+import { IActionElements } from '../..';
+import { Interaction, Connection } from '../../../../db';
+import { IMessagePayload } from '../../messager';
+import { chooseNextQuestion } from './';
 
-export async function preshowTrivialAnswerAction(
-  actionElements: IActionElements
-) {
+export async function preshowTrivialAnswerAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const data = JSON.parse(body.params.data);
   const interactionParams = {
     ...body.params,
     response: data.response,
-    prompt: data.question.text
-  }
+    prompt: data.question.text,
+  };
   const [interaction, otherConnections] = await Promise.all([
     Interaction.create(interactionParams),
-    Connection.getBySource(["display", "control"], body.params.performance_id),
+    Connection.getBySource(['display', 'control'], body.params.performance_id),
   ]);
 
   const nextQuestion = chooseNextQuestion(data.answered);
   const userPayload: IMessagePayload = {
-    action: "preshow-next-question",
+    action: 'preshow-next-question',
     params: {
       answered: data.answered,
       question: nextQuestion,
@@ -28,10 +26,10 @@ export async function preshowTrivialAnswerAction(
   };
 
   const dataPayload: IMessagePayload = {
-    action: "preshow-answer",
+    action: 'preshow-answer',
     params: {
       data,
-      interaction
+      interaction,
     },
   };
 
