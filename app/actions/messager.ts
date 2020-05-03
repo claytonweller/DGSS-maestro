@@ -1,41 +1,47 @@
-import * as AWS from 'aws-sdk'
-import * as util from 'util'
-import { Connection } from '../../db/connections'
+import * as AWS from 'aws-sdk';
+import * as util from 'util';
+import { Connection } from '../../db/connections';
 
 export const AWSMessager: IMessager = {
   sendToSender,
   sendToAll,
-  sendToIds
-}
+  sendToIds,
+};
 
-async function sendToSender({ event, payload }: { event: ILambdaEvent, payload: IMessagePayload }) {
+async function sendToSender({ event, payload }: { event: ILambdaEvent; payload: IMessagePayload }) {
   const gatewayParams: IGateWayParams = {
     event,
     connectionId: event.requestContext.connectionId,
-    payload
-  }
-  await sendMessageToAWSGateway(gatewayParams)
+    payload,
+  };
+  await sendMessageToAWSGateway(gatewayParams);
 }
 
-async function sendToAll({ event, payload }: { event: ILambdaEvent, payload: IMessagePayload }) {
-  const connections = await Connection.getAll()
-  const awsIds = connections.map(con => con.aws_connection_id)
-  await Promise.all(createMessagesForAws(event, payload, awsIds))
+async function sendToAll({
+  performance_id,
+  event,
+  payload,
+}: {
+  performance_id: number;
+  event: ILambdaEvent;
+  payload: IMessagePayload;
+}) {
+  const connections = await Connection.getAll(performance_id);
+  const awsIds = connections.map((con) => con.aws_connection_id);
+  await Promise.all(createMessagesForAws(event, payload, awsIds));
 }
 
-async function sendToIds(
-  { event, payload, ids }: { event: ILambdaEvent, payload: IMessagePayload, ids: string[] }
-) {
-  await Promise.all(createMessagesForAws(event, payload, ids))
+async function sendToIds({ event, payload, ids }: { event: ILambdaEvent; payload: IMessagePayload; ids: string[] }) {
+  await Promise.all(createMessagesForAws(event, payload, ids));
 }
 
 function createMessagesForAws(event: ILambdaEvent, payload: IMessagePayload, ids: string[]) {
-  return ids.map(id => {
+  return ids.map((id) => {
     const params: IGateWayParams = {
       event,
       connectionId: id,
-      payload: payload
-    }
+      payload: payload,
+    };
     return sendMessageToAWSGateway(params);
   });
 }
@@ -59,56 +65,47 @@ const sendMessageToAWSGateway = ({ event, connectionId, payload }: IGateWayParam
           console.log('err is', err);
           reject(err);
         } else {
-          resolve('This is an expired connection')
+          resolve('This is an expired connection');
         }
         resolve(data);
       }
     );
   });
-}
+};
 
 export interface IMessager {
-  sendToSender(
-    { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
-    sockets: any
-  )
-  sendToAll(
-    { event, payload }: { event: ILambdaEvent, payload: IMessagePayload },
-    sockets: any
-  ),
-  sendToIds(
-    { event, payload, ids }: { event: ILambdaEvent, payload: IMessagePayload, ids: string[] },
-    sockets: any
-  )
+  sendToSender({ event, payload }: { event: ILambdaEvent; payload: IMessagePayload }, sockets: any);
+  sendToAll({ event, payload }: { event: ILambdaEvent; payload: IMessagePayload }, sockets: any);
+  sendToIds({ event, payload, ids }: { event: ILambdaEvent; payload: IMessagePayload; ids: string[] }, sockets: any);
 }
 
 interface IGateWayParams {
-  event: ILambdaEvent,
-  connectionId: string | null,
-  payload: IMessagePayload
+  event: ILambdaEvent;
+  connectionId: string | null;
+  payload: IMessagePayload;
 }
 
 export interface ILambdaEvent {
   requestContext: {
-    routeKey: string
-    messageId: string
-    eventType: string
-    extendedRequestId: string
-    requestTime: string
-    messageDirection: string
-    stage: string
-    connectedAt: number
-    requestTimeEpoch: number
-    requestId: string
-    domainName: string
-    connectionId: string
-    apiId: string
-  },
-  body: any,
-  isBase64Encoded: boolean
+    routeKey: string;
+    messageId: string;
+    eventType: string;
+    extendedRequestId: string;
+    requestTime: string;
+    messageDirection: string;
+    stage: string;
+    connectedAt: number;
+    requestTimeEpoch: number;
+    requestId: string;
+    domainName: string;
+    connectionId: string;
+    apiId: string;
+  };
+  body: any;
+  isBase64Encoded: boolean;
 }
 
 export interface IMessagePayload {
-  action: string,
-  params: any
+  action: string;
+  params: any;
 }
