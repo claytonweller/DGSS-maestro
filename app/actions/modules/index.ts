@@ -25,6 +25,7 @@ export async function nextModuleAction(actionElements: IActionElements) {
 
   const instance = await ModuleInstance.create({ performance_id, module_id: modules[0].id });
   const payload: IMessagePayload = {
+    // TODO I added in a column to the modules table starting_action_string. May want to replace this with that.
     action: 'start-next-module',
     params: {
       performance,

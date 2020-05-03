@@ -23,13 +23,19 @@ async function attendeeJoin(actionElements: IActionElements) {
     attendee_id: attendee.id,
     performance_id,
   };
-  const queries = [
+
+  const [currentConn, audAttend, otherSources, instance] = await Promise.all([
     Connection.updateByAWSID(event.requestContext.connectionId, conParams),
     AuidenceAttendee.create({ audience_id, attendee_id: attendee.id }),
     Connection.getBySource(['control', 'display'], performance_id),
     ModuleInstance.getWithModule('preshow', performance_id),
-  ];
-  const [currentConn, audAttend, otherSources, currentModule] = await Promise.all(queries);
+  ]);
+  const currentModule = {
+    instance,
+    module: {
+      title: 'preshow',
+    },
+  };
 
   const payload: IMessagePayload = {
     action: 'performance-joined',
@@ -51,17 +57,20 @@ async function attendeeJoin(actionElements: IActionElements) {
 async function displayJoin(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const { performance_id } = body.params;
-  // const currentConn = await Connection.updateByAWSID(event.requestContext.connectionId, { performance_id })
-  // const control = await Connection.getBySource(['control'], performance_id)
 
-  const queries = [
+  const [instance, currentConn, control]: any[] = await Promise.all([
     ModuleInstance.getWithModule('preshow', performance_id),
     Connection.updateByAWSID(event.requestContext.connectionId, { performance_id }),
     Connection.getBySource(['control'], performance_id),
     new Promise((r) => r()), // For some reason Promise.all just needed another promise... don't ask me.
-  ];
+  ]);
 
-  const [currentModule, currentConn, control]: any[] = await Promise.all(queries);
+  const currentModule = {
+    instance,
+    module: {
+      title: 'preshow',
+    },
+  };
 
   const payload: IMessagePayload = {
     action: 'performance-joined',
