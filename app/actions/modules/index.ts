@@ -2,9 +2,11 @@ import { IActionElements } from '../';
 import { IMessagePayload } from '../messager';
 import { preshowActionHash } from './preshow';
 import { Module, ModuleInstance, Performance, Connection } from '../../../db';
+import { bootcampActionHash } from './bootcamp';
 
 export const moduleActionHash = {
   ...preshowActionHash,
+  ...bootcampActionHash,
   'determine-next-module': nextModuleAction,
 };
 

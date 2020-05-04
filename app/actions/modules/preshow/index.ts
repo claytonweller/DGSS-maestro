@@ -4,7 +4,6 @@ import { preshowTrivialAnswerAction } from './trivial-answer';
 import { coreQuestions, trivialQuestions } from './questions';
 
 export const preshowActionHash = {
-  'preshow-start-performance': () => console.log('START'),
   'preshow-acknowledge': preshowAcknowledgeAction,
   'preshow-core-answer': preshowCoreAnswerAction,
   'preshow-trivial-answer': preshowTrivialAnswerAction,

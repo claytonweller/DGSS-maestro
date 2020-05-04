@@ -14,7 +14,7 @@ export async function createPerformanceAction(actionElements: IActionElements) {
   ]);
 
   const performance_id = performance.id;
-  const [audience, instance] = await Promise.all([
+  const [audience, instance, currentConn] = await Promise.all([
     Audience.create({ performance_id, size: 0 }),
     ModuleInstance.create({ performance_id, module_id: preshowModule[0].id }),
     Connection.updateByAWSID(control_aws_id, { performance_id }),
@@ -28,6 +28,7 @@ export async function createPerformanceAction(actionElements: IActionElements) {
     action: 'performance-created',
     params: {
       performance: updatedPerformance,
+      currentConn,
       currentModule: {
         module: preshowModule[0],
         instance,

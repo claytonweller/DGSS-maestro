@@ -22,7 +22,7 @@ async function sendToAll({
   event,
   payload,
 }: {
-  performance_id: number;
+  performance_id?: number;
   event: ILambdaEvent;
   payload: IMessagePayload;
 }) {
@@ -75,7 +75,10 @@ const sendMessageToAWSGateway = ({ event, connectionId, payload }: IGateWayParam
 
 export interface IMessager {
   sendToSender({ event, payload }: { event: ILambdaEvent; payload: IMessagePayload }, sockets: any);
-  sendToAll({ event, payload }: { event: ILambdaEvent; payload: IMessagePayload }, sockets: any);
+  sendToAll(
+    { performance_id, event, payload }: { performance_id?: number; event: ILambdaEvent; payload: IMessagePayload },
+    sockets: any
+  );
   sendToIds({ event, payload, ids }: { event: ILambdaEvent; payload: IMessagePayload; ids: string[] }, sockets: any);
 }
 
