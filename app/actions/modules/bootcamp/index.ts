@@ -3,6 +3,7 @@ import { bootcampLogoAction } from './logo';
 import { bootcampMetricAction } from './metric';
 import { bootcampStartTestAction } from './startTest';
 import { bootcampEndTestAction } from './endTest';
+import { bootcampTestAttempAction } from './testAttempt';
 
 export const bootcampActionHash = {
   'bootcamp-start-test': bootcampStartTestAction,
@@ -10,4 +11,5 @@ export const bootcampActionHash = {
   'bootcamp-get-metric': bootcampMetricAction,
   'bootcamp-to-logo': bootcampLogoAction,
   'bootcamp-end-test': bootcampEndTestAction,
+  'bootcamp-test-attempt': bootcampTestAttempAction,
 };

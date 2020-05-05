@@ -16,7 +16,7 @@ async function attendeeJoin(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const name = body.params.name ? body.params.name : 'Anonymous';
 
-  const { audience_id, performance_id } = body.params;
+  const { audience_id, performance_id, current_module_title } = body.params;
   // TODO eventually make it able to find exsiting attendees to attach them to shows
   const attendee = await Attendee.create({ name });
   const conParams = {
@@ -28,12 +28,12 @@ async function attendeeJoin(actionElements: IActionElements) {
     Connection.updateByAWSID(event.requestContext.connectionId, conParams),
     AuidenceAttendee.create({ audience_id, attendee_id: attendee.id }),
     Connection.getBySource(['control', 'display'], performance_id),
-    ModuleInstance.getWithModule('preshow', performance_id),
+    ModuleInstance.getWithModule(current_module_title, performance_id),
   ]);
   const currentModule = {
     instance,
     module: {
-      title: 'preshow',
+      title: current_module_title,
     },
   };
 
@@ -56,10 +56,10 @@ async function attendeeJoin(actionElements: IActionElements) {
 
 async function displayJoin(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
-  const { performance_id } = body.params;
+  const { performance_id, current_module_title } = body.params;
 
   const [instance, currentConn, control]: any[] = await Promise.all([
-    ModuleInstance.getWithModule('preshow', performance_id),
+    ModuleInstance.getWithModule(current_module_title, performance_id),
     Connection.updateByAWSID(event.requestContext.connectionId, { performance_id }),
     Connection.getBySource(['control'], performance_id),
     new Promise((r) => r()), // For some reason Promise.all just needed another promise... don't ask me.
@@ -68,7 +68,7 @@ async function displayJoin(actionElements: IActionElements) {
   const currentModule = {
     instance,
     module: {
-      title: 'preshow',
+      title: current_module_title,
     },
   };
 
