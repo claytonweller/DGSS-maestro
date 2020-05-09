@@ -11,7 +11,9 @@ export async function bootcampFactAction(actionElements: IActionElements) {
   ]);
   const module_id = modules[0].id;
   const interactions = await Interaction.getByParam({ performance_id, module_id });
-  const questionInteractions = interactions.filter((int) => int.data.question);
+  const questionInteractions = interactions.filter((int) => {
+    int.data.question && int.response !== '-skip-' && int.prompt !== 'What name do you want to use tonight?';
+  });
   const randomFact = questionInteractions[Math.floor(Math.random() * questionInteractions.length)];
   const payload: IMessagePayload = {
     action: 'bootcamp-fact',
