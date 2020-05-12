@@ -10,24 +10,30 @@ export const moduleActionHash = {
   ...preshowActionHash,
   ...bootcampActionHash,
   'determine-next-module': nextModuleAction,
+  'jump-to-module': jumpToModuleAction,
 };
 
-export async function nextModuleAction(actionElements: IActionElements) {
+async function switchModules(moduleTitle, actionElements: IActionElements) {
   const { body, event, sockets, messager } = actionElements;
-  const currentModuleTitle = body.params.currentModule.module.title;
   const { performance_id } = body.params.currentModule.instance;
 
-  // TODO eventually module selection will be more dynamic with more modules and a less linear setup
-  let nextModuleTitle = 'preshow';
-  if (currentModuleTitle === 'preshow') nextModuleTitle = 'bootcamp';
-
   const [modules, performance, connections] = await Promise.all([
-    Module.getByParam({ title: nextModuleTitle }),
-    Performance.update(performance_id, { current_module_title: nextModuleTitle }),
+    Module.getByParam({ title: moduleTitle }),
+    Performance.update(performance_id, { current_module_title: moduleTitle }),
     Connection.getAll(performance_id),
   ]);
 
+  const moduleId = modules[0] && modules[0].id;
+  if (!moduleId) {
+    const payload: IMessagePayload = {
+      action: 'module-switch-fail',
+      params: { message: `Module ${moduleTitle} not found` },
+    };
+    return await messager.sendToSender({ event, payload }, sockets);
+  }
+
   const instance = await ModuleInstance.create({ performance_id, module_id: modules[0].id });
+
   const payload: IMessagePayload = {
     // TODO I added in a column to the modules table starting_action_string. May want to replace this with that.
     action: 'start-next-module',
@@ -42,4 +48,20 @@ export async function nextModuleAction(actionElements: IActionElements) {
 
   const ids = connections.map((c) => c.aws_connection_id);
   await messager.sendToIds({ ids, event, payload }, sockets);
+}
+
+async function jumpToModuleAction(actionElements: IActionElements) {
+  const { moduleTitle } = actionElements.body.params;
+  await switchModules(moduleTitle, actionElements);
+}
+
+async function nextModuleAction(actionElements: IActionElements) {
+  const { currentModule } = actionElements.body.params;
+  const currentModuleTitle = currentModule.module.title;
+
+  // TODO eventually module selection will be more dynamic with more modules and a less linear setup
+  let nextModuleTitle = 'preshow';
+  if (currentModuleTitle === 'preshow') nextModuleTitle = 'bootcamp';
+
+  switchModules(nextModuleTitle, actionElements);
 }
