@@ -32,5 +32,3 @@ typings/
 
 # Don't need the serverless compliation
 .serverless
-
-

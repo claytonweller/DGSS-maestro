@@ -11,7 +11,8 @@
     "install-prod": "yarn install --production --modules-folder ./nodejs/node_modules",
     "deploy": "yarn build && yarn install-prod && yarn sls deploy -v",
     "deploy-function": "yarn build && yarn sls deploy -f",
-    "sls": "eval $(egrep -v '^#' .env | xargs) ../node_modules/.bin/sls"
+    "sls": "eval $(egrep -v '^#' .env | xargs) ../node_modules/.bin/sls",
+    "create-module": "yarn build && node create-module.js"
   },
   "author": "Clayton Weller",
   "license": "ISC",

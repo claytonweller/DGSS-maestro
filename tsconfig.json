@@ -27,7 +27,6 @@
   ],
   "include": [
     "app",
-    "test",
-    "integration"
+    "create-module.ts"
   ]
 }
