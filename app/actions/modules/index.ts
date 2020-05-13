@@ -15,12 +15,13 @@ export const moduleActionHash = {
 
 async function switchModules(moduleTitle, actionElements: IActionElements) {
   const { body, event, sockets, messager } = actionElements;
-  const { performance_id } = body.params.currentModule.instance;
+  const { performance_id, id } = body.params.currentModule.instance;
 
   const [modules, performance, connections] = await Promise.all([
     Module.getByParam({ title: moduleTitle }),
     Performance.update(performance_id, { current_module_title: moduleTitle }),
     Connection.getAll(performance_id),
+    ModuleInstance.update(id, { completed_at: new Date().toISOString() }),
   ]);
 
   const moduleId = modules[0] && modules[0].id;
