@@ -13,6 +13,22 @@ export const moduleActionHash = {
   'jump-to-module': jumpToModuleAction,
 };
 
+async function jumpToModuleAction(actionElements: IActionElements) {
+  const { moduleTitle } = actionElements.body.params;
+  await switchModules(moduleTitle, actionElements);
+}
+
+async function nextModuleAction(actionElements: IActionElements) {
+  const { currentModule } = actionElements.body.params;
+  const currentModuleTitle = currentModule.module.title;
+
+  // TODO eventually module selection will be more dynamic with more modules and a less linear setup
+  let nextModuleTitle = 'preshow';
+  if (currentModuleTitle === 'preshow') nextModuleTitle = 'bootcamp';
+
+  switchModules(nextModuleTitle, actionElements);
+}
+
 async function switchModules(moduleTitle, actionElements: IActionElements) {
   const { body, event, sockets, messager } = actionElements;
   const { performance_id, id } = body.params.currentModule.instance;
@@ -35,6 +51,18 @@ async function switchModules(moduleTitle, actionElements: IActionElements) {
 
   const instance = await ModuleInstance.create({ performance_id, module_id: modules[0].id });
 
+  const ids = connections.reduce(
+    (pre, c) => {
+      if (c.source === 'crowd') {
+        pre.crowd.push(c.aws_connection_id);
+      } else {
+        pre.other.push(c.aws_connection_id);
+      }
+      return pre;
+    },
+    { crowd: [], other: [] }
+  );
+
   const payload: IMessagePayload = {
     // TODO I added in a column to the modules table starting_action_string. May want to replace this with that.
     action: 'start-next-module',
@@ -47,22 +75,16 @@ async function switchModules(moduleTitle, actionElements: IActionElements) {
     },
   };
 
-  const ids = connections.map((c) => c.aws_connection_id);
-  await messager.sendToIds({ ids, event, payload }, sockets);
-}
+  const advancedPayload: IMessagePayload = {
+    action: 'start-next-module',
+    params: {
+      ...payload.params,
+      attendeeCount: ids.crowd.length,
+    },
+  };
 
-async function jumpToModuleAction(actionElements: IActionElements) {
-  const { moduleTitle } = actionElements.body.params;
-  await switchModules(moduleTitle, actionElements);
-}
-
-async function nextModuleAction(actionElements: IActionElements) {
-  const { currentModule } = actionElements.body.params;
-  const currentModuleTitle = currentModule.module.title;
-
-  // TODO eventually module selection will be more dynamic with more modules and a less linear setup
-  let nextModuleTitle = 'preshow';
-  if (currentModuleTitle === 'preshow') nextModuleTitle = 'bootcamp';
-
-  switchModules(nextModuleTitle, actionElements);
+  await Promise.all([
+    messager.sendToIds({ ids: ids.crowd, event, payload }, sockets),
+    messager.sendToIds({ ids: ids.other, event, payload: advancedPayload }, sockets),
+  ]);
 }

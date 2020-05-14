@@ -12,16 +12,18 @@ import { boatraceEndRace } from './endRace';
 import { boatraceStroke } from './stroke';
 
 export const boatraceActionHash = {
-  'boatrace-title': boatraceTitleAction,
-  'boatrace-create-boats': boatraceCreateBoatsAction,
-  'boatrace-board-boat': boatraceBoardBoatAction,
-  'boatrace-select-cockswains': boatraceSelectCoxswains,
-  'boatrace-start-naming-boats': boatraceStartNamingBoats,
-  'boatrace-name-boat': boatraceNameBoat,
-  'boatrace-stop-naming-boats': boatraceStopNamingBoats,
-  'boatrace-reveal-boat-name': boatraceRevealBoatName,
-  'boatrace-next-instruction': boatraceNextInstruction,
-  'boatrace-start-race': boatraceStartRace,
-  'boatrace-stroke': boatraceStroke,
-  'boatrace-end-race': () => boatraceEndRace,
+  'boatrace-title': boatraceTitleAction, // Control
+  'boatrace-reveal-boat-name': boatraceRevealBoatName, // Control
+  'boatrace-next-instruction': boatraceNextInstruction, // Control
+  'boatrace-start-race': boatraceStartRace, // Control
+  'boatrace-stroke': boatraceStroke, // Crowd
+  'boatrace-end-race': boatraceEndRace, // Control
+
+  // TODO these functions may be generalizable to other 'team' based modules
+  'boatrace-create-boats': boatraceCreateBoatsAction, // Control
+  'boatrace-select-cockswains': boatraceSelectCoxswains, // Control
+  'boatrace-board-boat': boatraceBoardBoatAction, // Crowd
+  'boatrace-start-naming-boats': boatraceStartNamingBoats, // Control
+  'boatrace-name-boat': boatraceNameBoat, // Crowd
+  'boatrace-stop-naming-boats': boatraceStopNamingBoats, // Control
 };
