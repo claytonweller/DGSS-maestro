@@ -8,8 +8,33 @@ export async function joinPerformanceAction(actionElements: IActionElements) {
     await attendeeJoin(actionElements);
   } else if (source === 'display') {
     await displayJoin(actionElements);
+  } else if (source === 'control') {
+    await controlJoin(actionElements);
   }
   // TODO add in a message if these don't work out
+}
+
+async function controlJoin(actionElements: IActionElements) {
+  const { body, event, messager, sockets } = actionElements;
+  const { performance_id, current_module_title } = body.params;
+
+  const [instance, currentConn]: any[] = await Promise.all([
+    ModuleInstance.getWithModule(current_module_title, performance_id),
+    Connection.updateByAWSID(event.requestContext.connectionId, { performance_id }),
+  ]);
+
+  const currentModule = {
+    instance,
+    module: {
+      title: current_module_title,
+    },
+  };
+
+  const payload: IMessagePayload = {
+    action: 'performance-joined',
+    params: { currentConn, currentModule, source: 'control' },
+  };
+  await messager.sendToSender({ event, payload }, sockets);
 }
 
 async function attendeeJoin(actionElements: IActionElements) {
