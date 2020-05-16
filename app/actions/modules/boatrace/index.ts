@@ -21,8 +21,8 @@ export const boatraceActionHash = {
 
   // TODO these functions may be generalizable to other 'team' based modules
   'boatrace-create-boats': boatraceCreateBoatsAction, // Control
-  'boatrace-select-cockswains': boatraceSelectCoxswains, // Control
   'boatrace-board-boat': boatraceBoardBoatAction, // Crowd
+  'boatrace-select-cockswains': boatraceSelectCoxswains, // Control
   'boatrace-start-naming-boats': boatraceStartNamingBoats, // Control
   'boatrace-name-boat': boatraceNameBoat, // Crowd
   'boatrace-stop-naming-boats': boatraceStopNamingBoats, // Control

@@ -17,18 +17,3 @@ export async function boatraceCreateBoatsAction(actionElements: IActionElements)
   const ids = connections.map((c) => c.aws_connection_id);
   await messager.sendToIds({ ids, event, payload }, sockets);
 }
-
-////
-// const createBoats = (boatCount, currentModule) => {
-//   const boats: ICreateTeamParams[] = [];
-//   for (let i = 0; i < boatCount; i++) {
-//     boats.push({
-//       attendee_aws_ids: [],
-//       module_instance_id: currentModule.instance.id,
-//       module_id: currentModule.module.id,
-//     });
-//   }
-
-//   const boatQueries = boats.map((boat) => Team.create(boat));
-//   return Promise.all(boatQueries);
-// };
