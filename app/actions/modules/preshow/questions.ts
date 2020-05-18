@@ -53,7 +53,7 @@ export const coreQuestions: ICoreQuestion[] = [
   },
   {
     column: 'center_of_attention',
-    text: 'How do you feel about being the center of attention?',
+    text: 'How do you feel about public speaking?',
     responseType: 'multiple-choice',
     choices: ['Great', 'Good', 'Fine', "Don't even look at me"],
     display: 'Being in the limelight? _NAME_ says, "_RESPONSE_"',
