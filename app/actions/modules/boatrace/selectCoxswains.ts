@@ -9,13 +9,17 @@ export async function boatraceSelectCoxswains(actionElements: IActionElements) {
   const { instance } = body.params.currentModule;
   const { performance_id, id } = instance;
 
+  const endBoardingPayload: IMessagePayload = { action: 'boatrace-boarding-over', params: {} };
+  const endBoardingMessage = messager.sendToAll({ performance_id, event, payload: endBoardingPayload }, sockets);
+
   const [boats, attendees, connections] = await Promise.all([
     Team.getByParam({ module_instance_id: id }),
     Attendee.getByPerfomanceId(performance_id),
     Connection.getBySource(['control', 'display'], performance_id),
+    endBoardingMessage,
   ]);
 
-  const { liveBoats, deadBoats } = removeDeadBoats(boats, 4);
+  const { liveBoats, deadBoats } = removeDeadBoats(boats, 2);
 
   const boatsWithCoxswains = liveBoats.map((b) => {
     const coxswain = selectCoxswain(b, attendees);
@@ -27,13 +31,13 @@ export async function boatraceSelectCoxswains(actionElements: IActionElements) {
   });
 
   const payload: IMessagePayload = {
-    action: 'boatrace-coxswain-selected',
+    action: 'boatrace-coxswains-selected',
     params: {
       boats: boatsWithCoxswains,
     },
   };
 
-  const messages = createTeamMessages(payload, boatsWithCoxswains, messager, sockets);
+  const messages = createTeamMessages(payload, boatsWithCoxswains, actionElements);
   const ids = connections.map((c) => c.aws_connection_id);
   messages.push(messager.sendToIds({ ids, event, payload }, sockets));
   const deadBoatsToSink = deadBoats.map((b) => Team.remove(b.id));
@@ -101,7 +105,8 @@ const rankInterest = (string) => {
   return 1;
 };
 
-const createTeamMessages = (payload, boatsWithCoxswains, messager, sockets) => {
+const createTeamMessages = (payload, boatsWithCoxswains, actionElements) => {
+  const { event, messager, sockets } = actionElements;
   return boatsWithCoxswains.reduce((msgs, boat) => {
     const { captain_aws_id, captain_name, attendee_aws_ids } = boat;
     const cxswnPayload: IMessagePayload = { ...payload, params: { boat, youAreCoxswain: true } };
