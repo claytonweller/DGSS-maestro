@@ -36,7 +36,7 @@ async function join(module_instance_id, attendee_aws_id, team_id, messageParams)
   return res.rows[0];
 }
 
-async function createMany(teamCount: number, module_instance_id: number, module_id: number) {
+async function createMany({ teamCount, module_instance_id, module_id, initialState }: ICreateManyTeamsParams) {
   const teams: ICreateTeamParams[] = [];
   for (let i = 0; i < teamCount; i++) {
     teams.push({
@@ -44,11 +44,19 @@ async function createMany(teamCount: number, module_instance_id: number, module_
       module_instance_id,
       module_id,
       name: `${i + 1}`,
+      state: initialState ? JSON.stringify(initialState) : undefined,
     });
   }
 
-  const boatQueries = teams.map((team) => crud.create(team));
-  return await Promise.all(boatQueries);
+  const teamQueries = teams.map((team) => crud.create(team));
+  return await Promise.all(teamQueries);
+}
+
+export interface ICreateManyTeamsParams {
+  teamCount: number;
+  module_instance_id: number;
+  module_id: number;
+  initialState?: {};
 }
 
 export interface ICreateTeamParams {
@@ -56,4 +64,5 @@ export interface ICreateTeamParams {
   module_instance_id: number;
   module_id: number;
   name: string;
+  state?: string;
 }

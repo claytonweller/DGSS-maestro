@@ -10,11 +10,13 @@ import { boatraceNextInstruction } from './nextInstruction';
 import { boatraceStartRace } from './startRace';
 import { boatraceEndRace } from './endRace';
 import { boatraceStroke } from './stroke';
+import { boatraceInstructionsComplete } from './instructionsComplete';
 
 export const boatraceActionHash = {
   'boatrace-title': boatraceTitleAction, // Control
   'boatrace-reveal-boat-name': boatraceRevealBoatName, // Control
   'boatrace-next-instruction': boatraceNextInstruction, // Control
+  'boatrace-instructions-complete': boatraceInstructionsComplete, // Display
   'boatrace-start-race': boatraceStartRace, // Control
   'boatrace-stroke': boatraceStroke, // Crowd
   'boatrace-end-race': boatraceEndRace, // Control
