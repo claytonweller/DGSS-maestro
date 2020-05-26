@@ -2,12 +2,13 @@ import { IActionElements } from '../..';
 import { Interaction, Attendee, Connection } from '../../../../db';
 import { IMessagePayload } from '../../messager';
 import { chooseNextQuestion } from '.';
+import { IInteractionParams } from '../../../../db/interactions';
 
 export async function preshowCoreAnswerAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const data = JSON.parse(body.params.data);
 
-  const interactionParams = {
+  const interactionParams: IInteractionParams = {
     ...body.params,
     response: data.response,
     prompt: data.question.text,

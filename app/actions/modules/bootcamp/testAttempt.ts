@@ -1,12 +1,13 @@
 import { IActionElements } from '../..';
 import { Connection, Interaction } from '../../../../db';
 import { IMessagePayload } from '../../messager';
+import { IInteractionParams } from '../../../../db/interactions';
 
 export async function bootcampTestAttempAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const { performance_id } = body.params;
 
-  const interactionParams = {
+  const interactionParams: IInteractionParams = {
     ...body.params,
     response: 'success',
     prompt: 'bootcamp-test-attempt',

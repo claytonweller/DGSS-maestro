@@ -1,13 +1,14 @@
 import { IActionElements } from '../../';
 import { IMessagePayload } from '../../messager';
 import { Team, Interaction, Connection } from '../../../../db';
+import { IInteractionParams } from '../../../../db/interactions';
 
 export async function boatraceNameBoat(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const { performance_id, data } = body.params;
   const { boat, name } = JSON.parse(data);
 
-  const interactionParams = {
+  const interactionParams: IInteractionParams = {
     ...body.params,
     response: name,
     prompt: 'boatrace-name-boat',

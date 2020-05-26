@@ -1,6 +1,6 @@
 import { crudify } from './index';
 import { db } from './index';
-import { Interaction } from './interactions';
+import { Interaction, IInteractionParams } from './interactions';
 const TABLE_NAME = 'teams';
 const crud = crudify(TABLE_NAME);
 export const Team = {
@@ -22,7 +22,7 @@ async function join(module_instance_id, attendee_aws_id, team_id, messageParams)
     RETURNING *;
   `;
 
-  const interactionParams = {
+  const interactionParams: IInteractionParams = {
     ...messageParams,
     response: team_id,
     prompt: 'Joined team',
