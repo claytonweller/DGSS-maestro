@@ -1,6 +1,6 @@
 import { IActionElements } from '../..';
 import { IMessagePayload } from '../../messager';
-import { Team, Connection } from '../../../../db';
+import { Team, Connection, ModuleInstance } from '../../../../db';
 import { createCommandMessages, createCommandQueries } from '.';
 
 export async function boatraceStartRace(actionElements: IActionElements) {
@@ -25,7 +25,12 @@ export async function boatraceStartRace(actionElements: IActionElements) {
     action: 'boatrace-race-started',
     params: { boats: updatedBoats },
   };
-  await Promise.all([messager.sendToIds({ ids, event, payload }, sockets), ...boatMessages]);
+
+  await Promise.all([
+    messager.sendToIds({ ids, event, payload }, sockets),
+    createInitialRaceState(module_instance_id, updatedBoats),
+    ...boatMessages,
+  ]);
 }
 
 ///////
@@ -43,4 +48,15 @@ const createMessagesForBoats = (newBoatinfo, actionElements: IActionElements) =>
     const commandMessages = createCommandMessages('boatrace-race-started', boat, rowers, actionElements);
     return [...messages, ...commandMessages];
   }, []);
+};
+
+const createInitialRaceState = (module_instance_id, boats) => {
+  const state = JSON.stringify({
+    boats,
+    podium: [],
+  });
+  const params = {
+    state,
+  };
+  return ModuleInstance.update(module_instance_id, params);
 };

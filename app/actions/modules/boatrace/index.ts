@@ -35,14 +35,14 @@ export const boatraceActionHash = {
 
 /////
 // This makes a new command for the coxswain of a given boat, and updates the Team.
-export const createCommandQueries = (boat) => {
+export const createCommandQueries = (boat, progress = '0') => {
   const crewIds = boat.attendee_aws_ids.filter((id) => id !== boat.captain_aws_id);
   // TODO Changethis to a real number
   const rowerStatuses = selectRandomCrewIds(crewIds, 2);
   const rowerIds = rowerStatuses.map((s) => Object.keys(s)[0]);
   return Promise.all([
     Attendee.getByAwsConnectionIds(rowerIds),
-    Team.update(boat.id, { progress: '0', state: JSON.stringify({ rowerStatuses }) }),
+    Team.update(boat.id, { progress, state: JSON.stringify({ rowerStatuses }) }),
   ]);
 };
 
