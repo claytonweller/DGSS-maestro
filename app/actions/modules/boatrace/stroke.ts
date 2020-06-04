@@ -13,6 +13,7 @@ export async function boatraceStroke(actionElements: IActionElements) {
   const boatAsItIsNow = boats[0];
   const { rowerStatuses } = boatAsItIsNow.state;
   const { success, mistake, progressMade, newStatuses } = evaluateStroke(rowerStatuses, aws_connection_id);
+  const progress = calculateProgress(boatAsItIsNow);
 
   if (mistake) {
     await issueNewCommands(boatAsItIsNow, actionElements);
@@ -21,8 +22,6 @@ export async function boatraceStroke(actionElements: IActionElements) {
   if (success && !progressMade) {
     await makeSuccessfulStroke(boatAsItIsNow, newStatuses, actionElements);
   }
-
-  const progress = calculateProgress(boatAsItIsNow);
 
   if (success && progressMade && progress < 100) {
     await boatProgresses(boatAsItIsNow, progress, actionElements);
@@ -76,7 +75,8 @@ const calculateProgress = (boat): number => {
   // TODO this could potentially be more dynamic
   const progress = parseInt(boat.progress);
 
-  if (progress < 50) return progress + 15;
+  // TODO put this back to 15
+  if (progress < 50) return progress + 95;
   if (progress < 75) return progress + 10;
   return progress + 5;
 };
@@ -118,10 +118,12 @@ const boatProgresses = async (boatAsItIsNow, progress, actionElements) => {
     params: { boats: updatedBoats },
   };
 
+  const ids = connections.map((c) => c.aws_connection_id);
+
   await Promise.all([
     ...createCommandMessages(action, updatedBoat, rowers, actionElements),
     ModuleInstance.update(module_instance_id, { state: updatedModuleState }),
-    messager.sendToIds({ event, payload: displayPayload, ids: [connections[0].aws_connection_id] }, sockets),
+    messager.sendToIds({ event, payload: displayPayload, ids }, sockets),
     saveInteraction(body, true),
   ]);
 };
