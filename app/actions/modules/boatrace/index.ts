@@ -66,17 +66,16 @@ export const createCommandMessages = (actionString, boat, rowers, actionElements
   return [coxswainMessage, crewMessage];
 };
 
-const createCoxswainCommand = (boat, rowers) => {
+export const createCoxswainCommand = (boat, rowers) => {
   const { rowerStatuses } = boat.state;
-
-  return rowers.map((r, i) => {
-    const matchedRowerInState = rowerStatuses.filter((status) => Object.keys(status)[0] === r.aws_connection_id)[0];
-    const hasRowed = matchedRowerInState[r.aws_connection_id];
+  return rowerStatuses.map((s, i) => {
+    const statusAwsId = Object.keys(s)[0];
+    const matchedRowerInState = rowers.filter((r) => r.aws_connection_id === statusAwsId)[0];
     return {
-      aws_connection_id: r.aws_connection_id,
-      name: r.name,
+      aws_connection_id: statusAwsId,
+      name: matchedRowerInState.name,
       position: i + 1,
-      hasRowed,
+      hasRowed: s[statusAwsId],
     };
   });
 };

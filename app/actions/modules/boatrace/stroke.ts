@@ -1,8 +1,8 @@
 import { IActionElements } from '../..';
 import { IMessagePayload } from '../../messager';
-import { Team, ModuleInstance, Connection } from '../../../../db';
+import { Team, ModuleInstance, Connection, Attendee } from '../../../../db';
 import { IInteractionParams, Interaction } from '../../../../db/interactions';
-import { createCommandQueries, createCommandMessages } from '.';
+import { createCommandQueries, createCommandMessages, createCoxswainCommand } from '.';
 
 export async function boatraceStroke(actionElements: IActionElements) {
   const { body, event } = actionElements;
@@ -12,9 +12,11 @@ export async function boatraceStroke(actionElements: IActionElements) {
   const boats = await Team.getByParam({ id: boatId });
   const boatAsItIsNow = boats[0];
   const { rowerStatuses } = boatAsItIsNow.state;
+  console.warn('OLD STATUS', rowerStatuses);
+
   const { success, mistake, progressMade, newStatuses } = evaluateStroke(rowerStatuses, aws_connection_id);
   const progress = calculateProgress(boatAsItIsNow);
-
+  console.warn('NEW STATUS', newStatuses);
   if (mistake) {
     await issueNewCommands(boatAsItIsNow, actionElements);
   }
@@ -90,9 +92,14 @@ const issueNewCommands = async (boatAsItIsNow, actionElements) => {
 const makeSuccessfulStroke = async (boatAsItIsNow, newStatuses, actionElements) => {
   const { body, event, messager, sockets } = actionElements;
   const params = { state: JSON.stringify({ rowerStatuses: newStatuses }) };
-  const updatedBoat = await Team.update(boatAsItIsNow.id, params);
+  const rowerIds = newStatuses.map((s) => Object.keys(s)[0]);
+  const [updatedBoat, rowers] = await Promise.all([
+    Team.update(boatAsItIsNow.id, params),
+    Attendee.getByAwsConnectionIds(rowerIds),
+  ]);
+  const command = createCoxswainCommand(updatedBoat, rowers);
   const ids = [event.requestContext.connectionId, updatedBoat.captain_aws_id];
-  const payload: IMessagePayload = { action: 'boatrace-stroke-success', params: { boat: updatedBoat } };
+  const payload: IMessagePayload = { action: 'boatrace-stroke-success', params: { boat: updatedBoat, command } };
   await Promise.all([messager.sendToIds({ event, payload, ids }, sockets), saveInteraction(body, true)]);
 };
 
