@@ -1,4 +1,5 @@
 import { boatraceActionHash } from './boatrace';
+import { trollyActionHash } from './trolly';
 import { IActionElements } from '../';
 import { IMessagePayload } from '../messager';
 import { preshowActionHash } from './preshow';
@@ -6,6 +7,7 @@ import { Module, ModuleInstance, Performance, Connection } from '../../../db';
 import { bootcampActionHash } from './bootcamp';
 
 export const moduleActionHash = {
+  ...trollyActionHash,
   ...boatraceActionHash,
   ...preshowActionHash,
   ...bootcampActionHash,
