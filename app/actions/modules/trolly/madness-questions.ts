@@ -1,4 +1,4 @@
-import { ITrollyQuestion } from '.';
+import { ITrollyQuestion } from './question';
 
 export const lockedMadnessQuestions: ITrollyQuestion[] = [
   { default: { text: '1 old person' }, alternative: { text: '1 baby' } },
