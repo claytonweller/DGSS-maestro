@@ -9,6 +9,7 @@ export const Interaction = {
 };
 
 async function createMany(attendeeIds: number[], params: any = {}) {
+  if (!attendeeIds.length) return [];
   const columns: string[] = [];
   const temp: string[] = [];
   const values: any[] = [];
@@ -19,17 +20,16 @@ async function createMany(attendeeIds: number[], params: any = {}) {
       values.push(params[k]);
     });
   }
-
   const rows = attendeeIds.map((id) => {
     return `( ${id}, ${temp.join(', ')} )`;
   });
+
   const query = `
     INSERT INTO ${TABLE_NAME} ( attendee_id, ${columns.join(', ')} )
     VALUES ${rows.join(', ')}
     RETURNING *;
   `;
 
-  console.warn(query);
   const res = await db.query(query, values);
   console.log('Create Many in ', TABLE_NAME);
   return res.rows;

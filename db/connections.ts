@@ -20,6 +20,7 @@ export async function getAll(performance_id?: number): Promise<IConnection[]> {
     params.push(performance_id);
     query += ' WHERE performance_id = $1';
   }
+  console.log('Get All Connections');
   const conns = await db.query(query, params);
   return conns.rows;
 }
@@ -45,6 +46,7 @@ export async function getBySource(sources: string[], performance_id = 0, limit =
     params.push(limit);
     query += ` LIMIT $${params.length}`;
   }
+  console.log(`Get ${sources.join(', ')} Connections`);
   const conns = await db.query(query, params);
   return conns.rows;
 }
