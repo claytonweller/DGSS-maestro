@@ -12,7 +12,10 @@ export async function trollyTitleAction(actionElements: IActionElements) {
   };
 
   await Promise.all([
-    await ModuleInstance.update(moduleInstanceId, { state: JSON.stringify({ pastQuestions: [] }) }),
+    await ModuleInstance.update(moduleInstanceId, {
+      is_active: true,
+      state: JSON.stringify({ pastQuestions: [] }),
+    }),
     await messager.sendToAll({ performance_id, event, payload }, sockets),
   ]);
 }

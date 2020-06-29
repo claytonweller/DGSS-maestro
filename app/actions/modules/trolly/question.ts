@@ -1,21 +1,19 @@
 import { IActionElements } from '../../';
 import { IMessagePayload } from '../../messager';
 import { Connection, ModuleInstance, Interaction, Audience } from '../../../../db';
+import { IModuleInstance } from '../../../../db/module_instances';
 
-export async function trollyQuestionAction(actionElements: IActionElements) {
-  const {
-    performance_id,
-    options,
-    currentModule,
-  }: { performance_id: number; options: IQuestionOptions; currentModule } = actionElements.body.params;
+export async function trollyQuestionAction(actionElements: IActionElements, mInstances?: IModuleInstance[]) {
+  const { performance_id, options, currentModule }: ITrollyQuestionParams = actionElements.body.params;
 
-  const [connections, audiences, moduleInstances] = await Promise.all([
+  const [connections, audiences, moduleInstances]: [any, any, IModuleInstance] = await Promise.all([
     Connection.getAll(performance_id),
     Audience.getByParam({ performance_id }),
-    ModuleInstance.getByParam({ id: currentModule.instance.id }),
+    mInstances ? mInstances : ModuleInstance.getByParam({ id: currentModule.instance.id }),
   ]);
 
-  const baseInstance: { state: ITrollyModuleState; id: number } = moduleInstances[0];
+  const baseInstance: IModuleInstance = moduleInstances[0];
+
   const ids = separateIds(connections);
   const { timer } = options;
   const matchedQuestion = findMatchedQuestion(baseInstance, options);
@@ -33,11 +31,6 @@ export async function trollyQuestionAction(actionElements: IActionElements) {
     if (finalInsatnce.state.timer && timer < 10000) {
       await closeQuestion(finalInsatnce, ids.allAwsConnectionIds, actionElements, true);
     }
-
-    // TODO these will apply with Trolly-Madness
-    // Check module instance for finish state
-    // If finish returns a flag saying there should be no more questions
-    // if not finish returns flag saying we should move to the next question.
   } else {
     await displayClosedQuestion(matchedQuestion, baseInstance, actionElements, ids.allAwsConnectionIds);
   }
@@ -183,4 +176,12 @@ export interface ITrollyModuleState {
   pastQuestions: ICurrentQuestion[];
   currentQuestion: ICurrentQuestion;
   timer?: number | null;
+}
+
+export interface ITrollyQuestionParams {
+  performance_id: number;
+  options: IQuestionOptions;
+  currentModule: {
+    instance: IModuleInstance;
+  };
 }
