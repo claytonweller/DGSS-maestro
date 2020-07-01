@@ -13,13 +13,8 @@ export async function trollyEndMadnessAction(actionElements: IActionElements) {
     ModuleInstance.getByParam({ id: instance.id }),
   ]);
   const currentInstance: IModuleInstance = moduleInstances[0];
-  console.warn(currentInstance.state);
-  const { pastQuestions, currentQuestion } = currentInstance.state;
-  const newState = {
-    ...currentInstance.state,
-    pastQuestions: [...pastQuestions, currentQuestion],
-    currentQuestion: {},
-  };
+
+  const newState = updateState(currentInstance);
   const ids = connections.map((c) => c.aws_connection_id);
 
   const payload: IMessagePayload = {
@@ -31,4 +26,31 @@ export async function trollyEndMadnessAction(actionElements: IActionElements) {
     messager.sendToIds({ event, payload, ids }, sockets),
     ModuleInstance.update(instance.id, { is_active: false, state: newState }),
   ]);
+}
+
+function currentQuestionNotSaved(currentQuestion, pastQuestions) {
+  const pastQuestionTexts = pastQuestions.map((q) => getQuestionText(q));
+
+  if (Object.keys(currentQuestion).length && pastQuestionTexts.includes(getQuestionText(currentQuestion))) {
+    return false;
+  }
+  return true;
+}
+
+function getQuestionText(question) {
+  return question.default.text + question.alternative.text;
+}
+
+function updateState(currentInstance: IModuleInstance) {
+  const { pastQuestions, currentQuestion } = currentInstance.state;
+
+  if (currentQuestionNotSaved(currentQuestion, pastQuestions) && Object.keys(currentQuestion).length) {
+    pastQuestions.push(currentQuestion);
+  }
+
+  return {
+    ...currentInstance.state,
+    pastQuestions,
+    currentQuestion: {},
+  };
 }

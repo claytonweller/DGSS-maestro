@@ -4,6 +4,7 @@ import { lockedMadnessQuestions, randomMadnessQuestions } from './madness-questi
 import { IMessagePayload } from '../../messager';
 import { ModuleInstance } from '../../../../db';
 import { IModuleInstance } from '../../../../db/module_instances';
+import { trollyEndMadnessAction } from './end-madness';
 
 export async function trollyMadnessAction(actionElements: IActionElements) {
   const { event, messager, sockets } = actionElements;
@@ -16,9 +17,7 @@ export async function trollyMadnessAction(actionElements: IActionElements) {
   await askLockedQuestions(actionElements);
   await askRandomQuestions(actionElements);
 
-  // If it makes it through all questions it should activate the finish function
-
-  // NOTE: It doesn't send out any messages of its own at the end.
+  trollyEndMadnessAction(actionElements);
 }
 
 async function askLockedQuestions(actionElements: IActionElements) {
@@ -40,7 +39,7 @@ async function askQuestions(questions: ITrollyQuestion[], actionElements: IActio
       performance_id,
       options: {
         question: questions[i],
-        timer: 2000,
+        timer: createTimer(questions, i),
       },
       currentModule,
     };
@@ -58,6 +57,14 @@ async function askQuestions(questions: ITrollyQuestion[], actionElements: IActio
       i = questions.length;
     }
   }
+}
+
+function createTimer(questions, i) {
+  const q = questions[i];
+  const textLength = q.alternative.text.length + q.default.text.length;
+  const extratime = textLength > 20 ? (textLength - 20) * 30 : 0;
+  const pressureTime = i > questions.length / 2 ? 500 : 0;
+  return 2000 + extratime - pressureTime;
 }
 
 function shuffleArray(array) {

@@ -113,7 +113,9 @@ async function closeQuestion(
   const { messager, sockets, event } = actionElements;
   const { state } = moduleInstance;
   state.timer = null;
-  state.pastQuestions.push(state.currentQuestion);
+
+  if (Object.keys(state.currentQuestion).length) state.pastQuestions.push(state.currentQuestion);
+
   const payload: IMessagePayload = {
     action: 'trolly-close-question',
     params: state,
