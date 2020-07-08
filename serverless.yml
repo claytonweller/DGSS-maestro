@@ -5,6 +5,7 @@ service: DGSS
 provider:
   name: aws
   runtime: nodejs12.x
+  timeout: 500
   websocketsApiName: maestro-socket
   websocketsApiRouteSelectionExpression: $request.body.action # custom routes are selected by the value of the action property in the body
   environment:

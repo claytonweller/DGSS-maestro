@@ -64,7 +64,7 @@ function createTimer(questions, i) {
   const textLength = q.alternative.text.length + q.default.text.length;
   const extratime = textLength > 20 ? (textLength - 20) * 30 : 0;
   const pressureTime = i > questions.length / 2 ? 500 : 0;
-  return 2000 + extratime - pressureTime;
+  return 3500 + extratime - pressureTime;
 }
 
 function shuffleArray(array) {
