@@ -41,13 +41,10 @@ async function attendeeJoin(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const name = body.params.name ? body.params.name : 'Anonymous';
 
-  const { audience_id, performance_id, current_module_title } = body.params;
-  // TODO eventually make it able to find exsiting attendees to attach them to shows
-  const attendee = await Attendee.create({ name });
-  const conParams = {
-    attendee_id: attendee.id,
-    performance_id,
-  };
+  const { audience_id, performance_id, current_module_title, attendee_id } = body.params;
+
+  const attendee = await getOrCreateAttendee(attendee_id, name);
+  const conParams = { attendee_id: attendee.id, performance_id };
 
   const [currentConn, audAttend, otherSources, instance] = await Promise.all([
     Connection.updateByAWSID(event.requestContext.connectionId, conParams),
@@ -75,6 +72,14 @@ async function attendeeJoin(actionElements: IActionElements) {
   }
 
   await Promise.all(messages);
+}
+
+async function getOrCreateAttendee(attendee_id, name) {
+  if (attendee_id) {
+    return (await Attendee.getByParam({ id: attendee_id }))[0];
+  }
+
+  return await Attendee.create({ name });
 }
 
 //////
