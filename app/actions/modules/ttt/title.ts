@@ -5,7 +5,7 @@ export async function tttTitleAction(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
 
   const payload: IMessagePayload = {
-    action: 'ttt-Title-grid',
+    action: 'ttt-show-title',
     params: { currentQuestion: body },
   };
 
