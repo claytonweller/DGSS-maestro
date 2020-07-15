@@ -74,12 +74,10 @@ const saveInteraction = (body, success) => {
 };
 
 const calculateProgress = (boat): number => {
-  // TODO this could potentially be more dynamic
   const progress = parseInt(boat.progress);
 
-  // TODO put this back to 15
-  if (progress < 50) return progress + 95;
-  if (progress < 75) return progress + 10;
+  if (progress < 50) return progress + 15;
+  if (progress < 85) return progress + 10;
   return progress + 5;
 };
 

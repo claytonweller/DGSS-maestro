@@ -14,9 +14,7 @@ export async function preshowCoreAnswerAction(actionElements: IActionElements) {
     prompt: data.question.text,
   };
   if (data.question.column === 'name') {
-    // TODO eventually  we might want to make unique names for anonymous attendees
-    const name = data.response === '-skip-' ? 'Anonymous' : data.response;
-    data.response = name;
+    const name = data.response;
     interactionParams.attendee_name = name;
     interactionParams.response = name;
   }

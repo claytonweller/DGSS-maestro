@@ -2,8 +2,6 @@ import { IActionElements } from '../../';
 import { IMessagePayload } from '../../messager';
 import { Team, Attendee, Connection } from '../../../../db';
 
-// TODO much of this could probably be repurposed and generalized for Team creation in other modules.
-
 export async function boatraceSelectCoxswains(actionElements: IActionElements) {
   const { body, event, messager, sockets } = actionElements;
   const { instance } = body.params.currentModule;

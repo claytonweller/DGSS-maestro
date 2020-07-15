@@ -24,7 +24,6 @@ export const boatraceActionHash = {
   'boatrace-stroke': boatraceStroke, // Crowd
   'boatrace-end-race': boatraceEndRace, // Control
 
-  // TODO these functions may be generalizable to other 'team' based modules
   'boatrace-create-boats': boatraceCreateBoatsAction, // Control
   'boatrace-board-boat': boatraceBoardBoatAction, // Crowd
   'boatrace-select-cockswains': boatraceSelectCoxswains, // Control
@@ -37,8 +36,7 @@ export const boatraceActionHash = {
 // This makes a new command for the coxswain of a given boat, and updates the Team.
 export const createCommandQueries = (boat, progress = '0') => {
   const crewIds = boat.attendee_aws_ids.filter((id) => id !== boat.captain_aws_id);
-  // TODO Changethis to a real number
-  const rowerStatuses = selectRandomCrewIds(crewIds, 2);
+  const rowerStatuses = selectRandomCrewIds(crewIds, 3);
   const rowerIds = rowerStatuses.map((s) => Object.keys(s)[0]);
   return Promise.all([
     Attendee.getByAwsConnectionIds(rowerIds),

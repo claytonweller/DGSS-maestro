@@ -3,15 +3,26 @@ import { Connection, Attendee, AuidenceAttendee, ModuleInstance } from '../../..
 import { IMessagePayload } from '../messager';
 
 export async function joinPerformanceAction(actionElements: IActionElements) {
-  const { source } = actionElements.body.params;
-  if (source === 'crowd') {
-    await attendeeJoin(actionElements);
-  } else if (source === 'display') {
-    await displayJoin(actionElements);
-  } else if (source === 'control') {
-    await controlJoin(actionElements);
+  const { body, event, sockets, messager } = actionElements;
+  const { source } = body.params;
+  try {
+    if (source === 'crowd') {
+      await attendeeJoin(actionElements);
+    } else if (source === 'display') {
+      await displayJoin(actionElements);
+    } else if (source === 'control') {
+      await controlJoin(actionElements);
+    }
+
+    throw new Error('Not a correct source');
+  } catch (error) {
+    const payload: IMessagePayload = {
+      action: 'performance-join-fail',
+      params: { message: 'Failed to join the performance', error },
+    };
+
+    messager.sendToSender({ event, payload }, sockets);
   }
-  // TODO add in a message if these don't work out
 }
 
 async function controlJoin(actionElements: IActionElements) {

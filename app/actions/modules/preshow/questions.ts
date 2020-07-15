@@ -15,7 +15,6 @@ interface ICoreQuestion extends IQuestion {
 
 export const coreQuestions: ICoreQuestion[] = [
   {
-    // TODO maybe some parsing logic to change this to datetime?
     column: 'time_constraint',
     text: "Are you on a time constraint? What's the longest you'd like this to run?",
     responseType: 'multiple-choice',
@@ -30,7 +29,6 @@ export const coreQuestions: ICoreQuestion[] = [
     display: '_NAME_ is expecting _RESPONSE_',
   },
   // {
-  //   // TODO I'll probably have to add in some logic around this.
   //   column: "group_name",
   //   text:
   //     "Did you come with a group? If so, talk to everyone and pick a code name. You all should enter it",

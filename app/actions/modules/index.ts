@@ -1,5 +1,6 @@
 import { boatraceActionHash } from './boatrace';
 import { trollyActionHash } from './trolly';
+import { tttActionHash } from './ttt';
 import { IActionElements } from '../';
 import { IMessagePayload } from '../messager';
 import { preshowActionHash } from './preshow';
@@ -7,6 +8,7 @@ import { Module, ModuleInstance, Performance, Connection } from '../../../db';
 import { bootcampActionHash } from './bootcamp';
 
 export const moduleActionHash = {
+  ...tttActionHash,
   ...trollyActionHash,
   ...boatraceActionHash,
   ...preshowActionHash,
@@ -24,7 +26,6 @@ async function nextModuleAction(actionElements: IActionElements) {
   const { currentModule } = actionElements.body.params;
   const currentModuleTitle = currentModule.module.title;
 
-  // TODO eventually module selection will be more dynamic with more modules and a less linear setup
   let nextModuleTitle = 'preshow';
   if (currentModuleTitle === 'preshow') nextModuleTitle = 'bootcamp';
 
@@ -66,7 +67,6 @@ async function switchModules(moduleTitle, actionElements: IActionElements) {
   );
 
   const payload: IMessagePayload = {
-    // TODO I added in a column to the modules table starting_action_string. May want to replace this with that.
     action: 'start-next-module',
     params: {
       performance,
