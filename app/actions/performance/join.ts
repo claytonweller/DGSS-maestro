@@ -12,13 +12,13 @@ export async function joinPerformanceAction(actionElements: IActionElements) {
       await displayJoin(actionElements);
     } else if (source === 'control') {
       await controlJoin(actionElements);
+    } else {
+      throw new Error('Not a correct source');
     }
-
-    throw new Error('Not a correct source');
   } catch (error) {
     const payload: IMessagePayload = {
       action: 'performance-join-fail',
-      params: { message: 'Failed to join the performance', error },
+      params: { message: 'Failed to join the performance', error: error.message },
     };
 
     messager.sendToSender({ event, payload }, sockets);

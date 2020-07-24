@@ -9,6 +9,20 @@ export const Team = {
   join,
 };
 
+export interface ITeam {
+  id: number;
+  state: any;
+  name: string;
+  progress: number;
+  module_instance_id: number;
+  created_at: string;
+  removed_at: string;
+  module_id: number;
+  attendee_aws_ids: string[];
+  captain_aws_id: string;
+  captain_name: string;
+}
+
 async function join(module_instance_id, attendee_aws_id, team_id, messageParams) {
   const leaveOtherTeams = `
     UPDATE teams

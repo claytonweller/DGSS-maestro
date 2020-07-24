@@ -1,9 +1,7 @@
 import { IActionElements } from '../../';
 import { IMessagePayload } from '../../messager';
 
-export async function tttChoiceAction(actionElements: IActionElements) {
-  const { body, event, messager, sockets } = actionElements;
-
+export async function tttChoiceAction({ body, event, messager, sockets }: IActionElements) {
   const payload: IMessagePayload = {
     action: 'ttt-choice-made',
     params: { currentQuestion: body },
