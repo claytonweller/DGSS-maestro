@@ -12,6 +12,6 @@ export const tttActionHash = {
   'ttt-teams': tttTeamsAction,
   'ttt-start-game': tttStartGameAction,
   'ttt-next-round': tttNextRoundAction,
-  'ttt-choice': () => tttChoiceAction,
-  'ttt-end-game': () => tttEndGameAction,
+  'ttt-choice': tttChoiceAction,
+  'ttt-end-game': tttEndGameAction,
 };

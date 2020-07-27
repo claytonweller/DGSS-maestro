@@ -10,12 +10,11 @@ export async function tttStartGameAction({ body, event, messager, sockets }: IAc
     ModuleInstance.getByParam({ id }),
     Connection.getBySource(['control', 'display'], performance_id),
   ]);
-  const { state } = moduleInstances[0];
 
+  const { state } = moduleInstances[0];
   const emptyGrid = createEmtpyGrid(height, width);
   const crowdPositions = getRandomCrowdPositions(emptyGrid, state);
   const currentGrid = createCurrentGrid(emptyGrid, crowdPositions);
-
   const newState = { ...state, previousGrid: emptyGrid, currentGrid };
   const crowdMessages: Promise<any>[] = crowdPositions.map((cp) => {
     const crowdPayload: IMessagePayload = {
