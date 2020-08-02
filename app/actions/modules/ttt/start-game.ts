@@ -101,14 +101,14 @@ function isObject(obj) {
 
 ///////////
 
-interface ICell {
+export interface ICell {
   X: string[];
   O: string[];
   locked: boolean;
   winner: string;
 }
 
-interface IPosition {
+export interface IPosition {
   height: number;
   width: number;
   team: string;
