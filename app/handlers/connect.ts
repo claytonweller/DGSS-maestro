@@ -1,18 +1,19 @@
-import { dbConnection } from '../../db'
-import { Connection } from "../../db/connections";
+import { db } from '../../db';
+import { Connection } from '../../db/connections';
 
-export const handler = async event => {
-  await dbConnection()
-  const aws_connection_id = event.requestContext.connectionId
+export const handler = async (event) => {
+  await db.connect();
+  console.warn('Connected to DB: ' + db.options.connectionString);
+  const aws_connection_id = event.requestContext.connectionId;
   const params = {
     performance_id: 1,
     attendee_id: 1,
     aws_connection_id,
-    source: 'string'
-  }
-  await Connection.create(params)
+    source: 'string',
+  };
+  await Connection.create(params);
   // This removes all the test connections so they don't gum up the works
-
+  await db.end();
   return {
     statusCode: 200,
     body: JSON.stringify(
@@ -22,6 +23,6 @@ export const handler = async event => {
       },
       null,
       2
-    )
+    ),
   };
 };

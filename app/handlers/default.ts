@@ -1,13 +1,13 @@
-import { dbConnection } from '../../db'
+import { db } from '../../db';
 import { manageEvent } from '../actions';
-import { AWSMessager } from "../actions/messager";
+import { AWSMessager } from '../actions/messager';
 
-export const handler = async event => {
-  await dbConnection()
-  await manageEvent(event, AWSMessager)
-
+export const handler = async (event) => {
+  await db.connect();
+  console.warn('Connected to DB: ' + db.options.connectionString);
+  await manageEvent(event, AWSMessager);
+  await db.end();
   return {
     statusCode: 200,
   };
-}
-
+};

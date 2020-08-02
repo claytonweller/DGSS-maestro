@@ -16,8 +16,3 @@ export { Attendee, AuidenceAttendee, Audience, Connection, Interaction, Module, 
 export const db = new Pool({
   connectionString: POSTGRES_URL,
 });
-
-export const dbConnection = async () => {
-  await db.connect();
-  console.warn('Connected to DB: ' + db.options.connectionString);
-};
