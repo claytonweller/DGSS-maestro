@@ -1,5 +1,5 @@
 import { crudify } from './index';
-import { db } from './index';
+import { db, makeQuery } from './index';
 
 const TABLE_NAME = 'current_connections';
 const crud = crudify(TABLE_NAME);
@@ -63,7 +63,7 @@ export async function create(params: ICreateParams): Promise<IConnection> {
     RETURNING *
   `;
   const qParams = [params.performance_id, params.attendee_id, params.aws_connection_id, params.source];
-  const conn = await db.query(query, qParams);
+  const conn = await makeQuery(query, qParams);
   return conn.rows[0];
 }
 
