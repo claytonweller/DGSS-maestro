@@ -2,7 +2,7 @@ import { IActionElements } from '../../';
 import { IMessagePayload } from '../../messager';
 import { Interaction, ModuleInstance } from '../../../../db';
 import { IInteractionParams } from '../../../../db/interactions';
-import { ICell, IPosition } from './start-game';
+import { ICell, IPosition } from './index';
 import { IModuleInstance } from '../../../../db/module_instances';
 
 export async function tttChoiceAction({ body, event, messager, sockets }: IActionElements) {
