@@ -1,5 +1,5 @@
 import { crudify } from './index';
-import { db } from '.';
+import { makeQuery } from '.';
 
 const TABLE_NAME = 'interactions';
 
@@ -30,7 +30,7 @@ async function createMany(attendeeIds: number[], params: any = {}) {
     RETURNING *;
   `;
 
-  const res = await db.query(query, values);
+  const res = await makeQuery(query, values);
   console.log('Create Many in ', TABLE_NAME);
   return res.rows;
 }

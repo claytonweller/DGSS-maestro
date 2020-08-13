@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { db } from './';
+import { makeQuery } from './';
 
 async function getByParam(table: string, params: any, limit?: number) {
   const arr: string[] = [`SELECT * FROM ${table} WHERE removed_at is null`];
@@ -13,7 +13,7 @@ async function getByParam(table: string, params: any, limit?: number) {
   if (limit) arr.push(`LIMIT ${limit}`);
 
   const query = arr.join(' ');
-  const res = await db.query(query, values);
+  const res = await makeQuery(query, values);
   console.log('Get from ', table);
   return res.rows;
 }
@@ -34,7 +34,7 @@ async function create(table: string, params: any) {
     VALUES ( ${temp.join(', ')} )
     RETURNING *;
   `;
-  const res = await db.query(query, values);
+  const res = await makeQuery(query, values);
   console.log('Create in ', table);
   return res.rows[0];
 }
@@ -53,7 +53,7 @@ async function update(table: string, id: number | string, params: any) {
     WHERE id = ${formatedId}
     RETURNING *;
   `;
-  const res = await db.query(query, values);
+  const res = await makeQuery(query, values);
   console.log('Update in ', table);
   return res.rows[0];
 }
@@ -65,7 +65,7 @@ async function remove(table: string, id: number | string, style: string = '') {
       WHERE id = $1
     `;
     console.log('HARD delete from ', table);
-    return await db.query(query, [id]);
+    return await makeQuery(query, [id]);
   }
   console.log('Soft delete from ', table);
   return await update(table, id, { removed_at: DateTime.local().toISO() });

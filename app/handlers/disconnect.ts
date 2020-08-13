@@ -1,9 +1,6 @@
-import { db } from '../../db';
 import { Connection } from '../../db/connections';
 
 export const handler = async (event) => {
-  await db.connect();
-  console.warn('Connected to DB: ' + db.options.connectionString);
   console.warn(event);
   try {
     console.warn('REMOVEAL ID', event.requestContext.connectionId);
@@ -16,7 +13,6 @@ export const handler = async (event) => {
     };
   }
 
-  await db.end();
   return {
     statusCode: 200,
     body: JSON.stringify(

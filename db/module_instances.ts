@@ -1,4 +1,4 @@
-import { crudify, db } from './index';
+import { crudify, makeQuery } from './index';
 
 const TABLE_NAME = 'module_instances';
 
@@ -9,7 +9,7 @@ async function getWithModule(title, performance_id) {
     WHERE i.performance_id = $1
     AND m.title = $2
   `;
-  const res = await db.query(query, [performance_id, title]);
+  const res = await makeQuery(query, [performance_id, title]);
   return res.rows[0];
 }
 

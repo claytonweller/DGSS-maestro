@@ -17,17 +17,6 @@ export const db = new Pool({
   connectionString: POSTGRES_URL,
 });
 
-// const clientConnector = (query: (client: Client) => any): (() => any) => {
-//   const connectedQuery = async () => {
-//     const client = await db.connect();
-//     const result = await query(client);
-//     client.release();
-//     return result;
-//   };
-
-//   return connectedQuery;
-// };
-
 export const makeQuery = async (query, params) => {
   const client = await db.connect();
   const result = await client.query(query, params);

@@ -1,4 +1,4 @@
-import { crudify, db } from './index';
+import { crudify, makeQuery } from './index';
 
 const TABLE_NAME = 'attendees';
 const crud = crudify(TABLE_NAME);
@@ -15,7 +15,7 @@ async function getByPerfomanceId(performance_id: number) {
     INNER JOIN current_connections c ON a.id = c.attendee_id
     WHERE c.performance_id = $1
   `;
-  const res = await db.query(query, [performance_id]);
+  const res = await makeQuery(query, [performance_id]);
   return res.rows;
 }
 
@@ -31,6 +31,6 @@ async function getByAwsConnectionIds(aws_connection_ids: string[]) {
   for (let i = 0; i < aws_connection_ids.length - 1; i++) {
     query += ` OR c.aws_connection_id = $${i + 2}`;
   }
-  const res = await db.query(query, aws_connection_ids);
+  const res = await makeQuery(query, aws_connection_ids);
   return res.rows;
 }

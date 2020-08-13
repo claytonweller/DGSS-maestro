@@ -1,5 +1,5 @@
 import { crudify } from './index';
-import { db } from './index';
+import { makeQuery } from './index';
 import { Interaction, IInteractionParams } from './interactions';
 const TABLE_NAME = 'teams';
 const crud = crudify(TABLE_NAME);
@@ -43,10 +43,10 @@ async function join(module_instance_id, attendee_aws_id, team_id, messageParams)
   };
 
   await Promise.all([
-    db.query(leaveOtherTeams, [attendee_aws_id, module_instance_id]),
+    makeQuery(leaveOtherTeams, [attendee_aws_id, module_instance_id]),
     Interaction.create(interactionParams),
   ]);
-  const res = await db.query(joinNewTeam, [attendee_aws_id, team_id]);
+  const res = await makeQuery(joinNewTeam, [attendee_aws_id, team_id]);
   return res.rows[0];
 }
 

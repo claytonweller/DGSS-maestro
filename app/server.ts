@@ -9,7 +9,6 @@ AWS.config.update({ region: 'us-east-1' });
 const wss = new WebSocket.Server({ port: 8080 });
 const clients = {};
 console.warn(`Websockets listening on wss://localhost:${wss.options.port}`);
-db.connect();
 console.warn('Connected to DB: ' + db.options.connectionString);
 
 wss.on('connection', async (ws, req) => {

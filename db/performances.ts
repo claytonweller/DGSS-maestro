@@ -1,5 +1,5 @@
 import { crudify } from './index';
-import { db } from './';
+import { makeQuery } from './';
 import { DateTime } from 'luxon';
 const TABLE_NAME = 'performances';
 
@@ -10,7 +10,7 @@ async function getActive() {
     WHERE ended_at is null
     AND created_at > $1
   `;
-  const res = await db.query(query, [DateTime.local().minus({ hours: 4 }).toISO()]);
+  const res = await makeQuery(query, [DateTime.local().minus({ hours: 4 }).toISO()]);
   return res.rows;
 }
 

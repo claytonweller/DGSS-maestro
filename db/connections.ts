@@ -1,5 +1,5 @@
 import { crudify } from './index';
-import { db, makeQuery } from './index';
+import { makeQuery } from './index';
 
 const TABLE_NAME = 'current_connections';
 const crud = crudify(TABLE_NAME);
@@ -21,7 +21,7 @@ export async function getAll(performance_id?: number): Promise<IConnection[]> {
     query += ' WHERE performance_id = $1';
   }
   console.log('Get All Connections');
-  const conns = await db.query(query, params);
+  const conns = await makeQuery(query, params);
   return conns.rows;
 }
 
@@ -47,7 +47,7 @@ export async function getBySource(sources: string[], performance_id = 0, limit =
     query += ` LIMIT $${params.length}`;
   }
   console.log(`Get ${sources.join(', ')} Connections`);
-  const conns = await db.query(query, params);
+  const conns = await makeQuery(query, params);
   return conns.rows;
 }
 
@@ -72,7 +72,7 @@ export async function removeByConnectionId(id) {
     DELETE FROM current_connections
     WHERE aws_connection_id = $1
   `;
-  return await db.query(query, [id]);
+  return await makeQuery(query, [id]);
 }
 
 export async function updateByAWSID(awsId, params): Promise<IConnection> {
@@ -88,7 +88,7 @@ export async function updateByAWSID(awsId, params): Promise<IConnection> {
     WHERE aws_connection_id = '${awsId}'
     RETURNING *;
   `;
-  const res = await db.query(query, values);
+  const res = await makeQuery(query, values);
   return res.rows[0];
 }
 
@@ -97,7 +97,7 @@ export async function removeAllBefore(performanceId = 0): Promise<void> {
     DELETE FROM ${TABLE_NAME}
     WHERE performance_id < $1
   `;
-  await db.query(query, [performanceId]);
+  await makeQuery(query, [performanceId]);
   console.log('CLEARED ALL CONNECTIONS FROM BEFORE PERFORMANCE: ', performanceId);
 }
 
